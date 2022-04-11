@@ -1,3 +1,4 @@
+
 .user_issue_book_microservices.egg-info
 .fuse_hidden*
 .directory
@@ -99,5 +100,3 @@ Temporary Items
 .idea/
 /tmp/
 .idea
-.dist
-/dist/

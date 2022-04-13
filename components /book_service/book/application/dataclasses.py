@@ -9,16 +9,16 @@ class Book:
     subtitle: str
     authors: str
     publisher: str
-    isbn10: int
+    isbn10: str
     isbn13: int
     pages: int
     year: int
     rating: int
     desc: str
-    price: str
+    price: int
     language: str
-    image: Optional[str] = None
-    error: Optional[str] = None
-    url: Optional[str] = None
+    # image: Optional[str] = None
+    # error: Optional[str] = None
+    # url: Optional[str] = None
     id: Optional[int] = None
-    pdf: Optional[dict] = None
+    # pdf: Optional[dict] = None

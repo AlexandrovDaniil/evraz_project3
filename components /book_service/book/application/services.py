@@ -19,19 +19,19 @@ class BookInfo(DTO):
     subtitle: str
     authors: str
     publisher: str
-    isbn10: int
+    isbn10: str
     isbn13: int
     pages: int
     year: int
     rating: int
     desc: str
-    price: str
+    price: int
     language: str
-    image: Optional[str]
-    url: Optional[str]
+    # image: Optional[str]
+    # url: Optional[str]
     id: Optional[int] = None
-    pdf: Optional[dict] = None
-    error: Optional[str] = None
+    # pdf: Optional[dict] = None
+    # error: Optional[str] = None
 
 
 @component
@@ -50,18 +50,56 @@ class Books:
     @join_point
     @validate_arguments
     def add_book(self, book: dict):
-        book = Book(**book)
+        book['price'] = float(book['price'][1:])
+        book_info = BookInfo(
+            title=book['title'],
+            subtitle=book['subtitle'],
+            authors=book['authors'],
+            publisher=book['publisher'],
+            isbn10=book['isbn10'],
+            isbn13=book['isbn13'],
+            pages=book['pages'],
+            year=book['year'],
+            rating=book['rating'],
+            desc=book['desc'],
+            price=book['price'],
+            language=book['language']
+        )
+        book = book_info.create_obj(Book)
         self.book_repo.add_instance(book)
-        # new_book = book_info.create_obj(Book)
-        # new_book = self.book_repo.add_instance(new_book)
-        #
-        # if self.publisher:
-        #     self.publisher.plan(
-        #         Message('ApiExchange',
-        #                 {'obj_type': 'book',
-        #                  'action': 'create',
-        #                  'data': new_book})
-        #     )
+
+    @join_point
+    @validate_arguments
+    def search_by_filter(self, filter_data: dict):
+        if 'order_by' in filter_data:
+            order_by = filter_data.pop('order_by')
+        else:
+            order_by = None
+        if 'authors' not in filter_data:
+            filter_data['authors'] = '%'
+        if 'publisher' not in filter_data:
+            filter_data['publisher'] = '%'
+        if 'title' not in filter_data:
+            filter_data['title'] = '%'
+
+        if 'price' not in filter_data:
+            res = self.book_repo.get_by_filter(**filter_data)
+
+        else:
+            price = filter_data.pop('price')
+            oper, val = price.split(':')
+            if oper not in ('lt, gt, lte, gte, eq'):
+                raise errors.WrongOper(oper=oper)
+            val = int(val)
+            res = self.book_repo.get_by_filter_price(filter_data['authors'], filter_data['publisher'],
+                                                     filter_data['title'], oper, val)
+
+        if order_by == 'price':
+            return sorted(res, key=lambda x: (x['price']), reverse=True)
+        elif order_by == 'pages':
+            return sorted(res, key=lambda x: (x['pages']), reverse=True)
+
+        return res
 
     @join_point
     @validate_arguments

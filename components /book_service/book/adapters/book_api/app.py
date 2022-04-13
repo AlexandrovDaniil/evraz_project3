@@ -13,5 +13,7 @@ def create_app(
     authenticator = Authenticator(app_groups=auth.ALL_GROUPS)
     if is_dev_mode:
         authenticator.set_strategies(auth.jwt_strategy)
-    app.register(controllers.Books(authenticator=authenticator, books=books))
+    app.register(controllers.Books(
+        # authenticator=authenticator,
+        books=books))
     return app

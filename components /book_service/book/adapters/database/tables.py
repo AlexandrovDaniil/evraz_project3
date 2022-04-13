@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, MetaData, String, Table, BigInteger
+from sqlalchemy import Column, Integer, MetaData, String, Table, BigInteger, Float
 
 naming_convention = {
     'ix': 'ix_%(column_0_label)s',
@@ -17,16 +17,16 @@ BOOK = Table(
     Column('subtitle', String(500)),
     Column('authors', String(350)),
     Column('publisher', String(350)),
-    Column('isbn10', BigInteger),
+    Column('isbn10', String(35)),
     Column('isbn13', BigInteger),
     Column('pages', Integer),
     Column('year', Integer),
     Column('rating', Integer),
     Column('desc', String(10000)),
-    Column('price', String(35)),
-    Column('image', String(350), nullable=True),
-    Column('url', String(350), nullable=True),
-    Column('pdf', String(500), nullable=True),
-    Column('error', String(50), nullable=True),
+    Column('price', Float),
+    # Column('image', String(350), nullable=True),
+    # Column('url', String(350), nullable=True),
+    # Column('pdf', String(500), nullable=True),
+    # Column('error', String(50), nullable=True),
     Column('language', String(50), nullable=True),
 )

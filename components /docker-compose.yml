@@ -93,16 +93,16 @@ services:
 #
 #
 #
-#  nginx:
-#    build:
-#      context: ./nginx
-#      dockerfile: Dockerfile
-#    ports:
-#      - "80:80"
-#      - "443:443"
-#    depends_on:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
 #      - user_backend
-#      - book_backend
+      - book_service
 #      - issue_backend
 
 volumes:

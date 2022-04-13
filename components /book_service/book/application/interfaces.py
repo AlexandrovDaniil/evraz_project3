@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from .dataclasses import Book
 
@@ -23,3 +23,10 @@ class BooksRepo(ABC):
 
     @abstractmethod
     def take_book(self, book_id: int, user_id: int): ...
+
+    @abstractmethod
+    def get_by_filter(self, authors: str, publisher: str, title: str) -> Optional[List[Book]]: ...
+
+    @abstractmethod
+    def get_by_filter_price(self, authors: str, publisher: str, title: str, oper: str, val: int) -> Optional[
+        List[Book]]: ...

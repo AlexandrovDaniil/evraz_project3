@@ -4,7 +4,7 @@ from classic.http_auth import authenticate, authenticator_needed
 from .join_points import join_point
 
 
-@authenticator_needed
+# @authenticator_needed
 @component
 class Books:
     books: services.Books
@@ -27,14 +27,35 @@ class Books:
         response.media = {'status': 'book added'}
 
     @join_point
-    @authenticate
+    # @authenticate
     def on_get_show_all(self, request, response):
         books = self.books.get_all()
         response.media = [{
             'book id': book.id,
-            'author': book.author,
-            'published year': book.published_year,
-            'title': book.title
+            'title': book.title,
+            'subtitle': book.subtitle,
+            'authors': book.authors,
+            'pages': book.pages,
+            'price': book.price,
+            'publisher': book.publisher,
+            'description': book.desc,
+            'published year': book.year,
+        } for book in books]
+
+    @join_point
+    # @authenticate
+    def on_get_filter(self, request, response):
+        books = self.books.search_by_filter(request.params)
+        response.media = [{
+            'book id': book.id,
+            'title': book.title,
+            'subtitle': book.subtitle,
+            'authors': book.authors,
+            'pages': book.pages,
+            'price': book.price,
+            'publisher': book.publisher,
+            'description': book.desc,
+            'published year': book.year,
         } for book in books]
 
     @join_point

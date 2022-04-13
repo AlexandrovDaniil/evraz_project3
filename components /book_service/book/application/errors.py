@@ -5,6 +5,10 @@ class NoBook(AppError):
     msg_template = "No book with id '{id}'"
     code = 'books.no_book'
 
+class WrongOper(AppError):
+    msg_template = "Oper: '{oper}' is not available"
+    code = 'books.no_oper'
+
 class NotAvailable(AppError):
     msg_template = "With id '{id}' not available"
     code = 'books.not_available'

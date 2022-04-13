@@ -38,6 +38,10 @@ class MessageBusCons:
         message_bus.broker_scheme.declare(MessageBusCons.connection)
 
 
+class Aspects:
+    services.join_points.join(DB.context)
+    book_api.join_points.join(DB.context)
+
 
 if __name__ == '__main__':
     MessageBusCons.declare_scheme()

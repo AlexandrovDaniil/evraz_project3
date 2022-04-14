@@ -105,33 +105,35 @@ class Books:
     @join_point
     @validate_arguments
     def search_by_filter(self, filter_data: dict):
-        if 'order_by' in filter_data:
-            order_by = filter_data.pop('order_by')
-        else:
-            order_by = None
-        if 'authors' not in filter_data:
-            filter_data['authors'] = '%'
-        if 'publisher' not in filter_data:
-            filter_data['publisher'] = '%'
-        if 'title' not in filter_data:
-            filter_data['title'] = '%'
 
-        if 'price' not in filter_data:
-            res = self.book_repo.get_by_filter(**filter_data)
+        # if 'order_by' in filter_data:
+        #     order_by = filter_data.pop('order_by')
+        # else:
+        #     order_by = None
+        # if 'authors' not in filter_data:
+        #     filter_data['authors'] = '%'
+        # if 'publisher' not in filter_data:
+        #     filter_data['publisher'] = '%'
+        # if 'title' not in filter_data:
+        #     filter_data['title'] = '%'
+        #
+        # if 'price' not in filter_data:
+        #     res = self.book_repo.get_by_filter(**filter_data)
+        #
+        # else:
+        price = filter_data['price']
+        oper, val = price.split(':')
+        if oper not in ('lt, gt, lte, gte, eq'):
+            raise errors.WrongOper(oper=oper)
+        #     val = int(val)
+        #     res = self.book_repo.get_by_filter_price(filter_data['authors'], filter_data['publisher'],
+        #                                              filter_data['title'], oper, val)
 
-        else:
-            price = filter_data.pop('price')
-            oper, val = price.split(':')
-            if oper not in ('lt, gt, lte, gte, eq'):
-                raise errors.WrongOper(oper=oper)
-            val = int(val)
-            res = self.book_repo.get_by_filter_price(filter_data['authors'], filter_data['publisher'],
-                                                     filter_data['title'], oper, val)
-
-        if order_by == 'price':
-            return sorted(res, key=lambda x: (x['price']), reverse=True)
-        elif order_by == 'pages':
-            return sorted(res, key=lambda x: (x['pages']), reverse=True)
+        res = self.book_repo.get_by_filter(filter_data)
+        # if order_by == 'price':
+        #     return sorted(res, key=lambda x: (x['price']), reverse=True)
+        # elif order_by == 'pages':
+        #     return sorted(res, key=lambda x: (x['pages']), reverse=True)
 
         return res
 

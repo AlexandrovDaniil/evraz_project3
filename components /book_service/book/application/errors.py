@@ -9,6 +9,10 @@ class WrongOper(AppError):
     msg_template = "Oper: '{oper}' is not available"
     code = 'books.no_oper'
 
+class UserAlreadyHasBook(AppError):
+    msg_template = "This user already has book"
+    code = 'books.user_has_book'
+
 class NotAvailable(AppError):
     msg_template = "With id '{id}' not available"
     code = 'books.not_available'

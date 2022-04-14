@@ -1,4 +1,5 @@
-from typing import Optional, List
+from datetime import datetime, timedelta
+from typing import Optional, List, Union
 
 import requests
 from classic.app import DTO, validate_with_dto
@@ -8,7 +9,7 @@ from pydantic import validate_arguments
 from classic.messaging import Message, Publisher
 
 from . import errors, interfaces
-from .dataclasses import Book
+from .dataclasses import Book, BookHistory
 
 join_points = PointCut()
 join_point = join_points.join_point
@@ -27,11 +28,22 @@ class BookInfo(DTO):
     desc: str
     price: int
     language: str
+    bought: Optional[bool] = False
+    booking_time: Optional[datetime] = None
     # image: Optional[str]
     # url: Optional[str]
-    id: Optional[int] = None
+    # id: Optional[int] = None
     # pdf: Optional[dict] = None
     # error: Optional[str] = None
+
+
+class BookHistoryInfo(DTO):
+    book_id: int
+    user_id: int
+    action: str
+    booking_time: datetime \
+        # = attr.ib(factory=lambda: datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+    id: Optional[int] = None
 
 
 @component
@@ -139,26 +151,21 @@ class Books:
         return books
 
     @join_point
+    def get_history(self, user_id: int) -> List[BookHistory]:
+        history_rows = self.book_repo.get_history(user_id)
+        return history_rows
+
+    @join_point
     @validate_arguments
     def return_book(self, book_id: int, user_id: int):
         book = self.book_repo.get_by_id(book_id)
         if not book:
             raise errors.NoBook(id=book_id)
-        if book.user_id == user_id:
-            self.book_repo.return_book(book_id)
-            if self.publisher:
-                self.publisher.plan(
-                    Message('ApiExchange',
-                            {'obj_type': 'user_book',
-                             'action': 'return',
-                             'data': {'id_book': book_id,
-                                      'id_user': user_id,
-                                      'book_title': book.title}
+        if book.booking_time is not None and book.booking_time > datetime.utcnow():
+            self.book_repo.update_booking_time(book_id, None)
 
-                             })
-                )
         else:
-            raise errors.WrongUser(book_id=book_id, user_id=user_id)
+            raise errors.NotAvailable(id=book_id)
 
     @join_point
     @validate_arguments
@@ -166,17 +173,30 @@ class Books:
         book = self.book_repo.get_by_id(book_id)
         if not book:
             raise errors.NoBook(id=book_id)
-        if book.user_id is None:
-            self.book_repo.take_book(book_id=book_id, user_id=user_id)
-            if self.publisher:
-                self.publisher.plan(
-                    Message('ApiExchange',
-                            {'obj_type': 'user_book',
-                             'action': 'take',
-                             'data': {'id_book': book_id,
-                                      'id_user': user_id,
-                                      'book_title': book.title}
-                             })
+        if isinstance(self.get_active_book(user_id), str):
+            if book.booking_time is None or book.booking_time < datetime.utcnow():
+                time_of_book = datetime.utcnow() + timedelta(minutes=1)
+                book_history = BookHistoryInfo(
+                    book_id=book_id,
+                    user_id=user_id,
+                    action='take book',
+                    booking_time=time_of_book
                 )
+                new_row_history = book_history.create_obj(BookHistory)
+                self.book_repo.take_book(new_row_history)
+                self.book_repo.update_booking_time(book_id, time_of_book)
+
+            else:
+                raise errors.NotAvailable(id=book_id)
         else:
-            raise errors.NotAvailable(id=book_id)
+            raise errors.UserAlreadyHasBook(id=user_id)
+
+    @join_point
+    @validate_arguments
+    def get_active_book(self, user_id: int) -> Union[Book, str]:
+        last_book = self.get_history(user_id)[-1]
+        book = self.book_repo.get_by_id(last_book.book_id)
+        if book.booking_time < datetime.utcnow() or book.booking_time is None:
+            return 'User has not active book'
+        else:
+            return book

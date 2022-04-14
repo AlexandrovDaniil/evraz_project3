@@ -30,11 +30,6 @@ class BookInfo(DTO):
     language: str
     bought: Optional[bool] = False
     booking_time: Optional[datetime] = None
-    # image: Optional[str]
-    # url: Optional[str]
-    # id: Optional[int] = None
-    # pdf: Optional[dict] = None
-    # error: Optional[str] = None
 
 
 class BookHistoryInfo(DTO):
@@ -50,6 +45,16 @@ class BookHistoryInfo(DTO):
 class Books:
     book_repo: interfaces.BooksRepo
     publisher: Optional[Publisher] = None
+
+    def _is_user_has_book(self, user_id: int) -> bool:
+        history = self.get_history(user_id)
+        if history:
+            last_row = history[-1]
+            last_book = self.book_repo.get_by_id(last_row.book_id)
+            if last_book.booking_time is None or last_book.booking_time < datetime.utcnow() or last_book.bought:
+                return False
+            return True
+        return False
 
     @join_point
     @validate_arguments
@@ -131,21 +136,6 @@ class Books:
         return res
 
     @join_point
-    @validate_arguments
-    def delete_book(self, id: int):
-        book = self.book_repo.get_by_id(id)
-        if not book:
-            raise errors.NoBook(id=id)
-        self.book_repo.delete_instance(id)
-        if self.publisher:
-            self.publisher.plan(
-                Message('ApiExchange',
-                        {'obj_type': 'book',
-                         'action': 'delete',
-                         'data': {'id_book': id}})
-            )
-
-    @join_point
     def get_all(self) -> List[Book]:
         books = self.book_repo.get_all()
         return books
@@ -161,21 +151,24 @@ class Books:
         book = self.book_repo.get_by_id(book_id)
         if not book:
             raise errors.NoBook(id=book_id)
-        if book.booking_time is not None and book.booking_time > datetime.utcnow():
-            self.book_repo.update_booking_time(book_id, None)
-
+        if self._is_user_has_book(user_id):
+            active_book = self.get_active_book(user_id)
+            if active_book.isbn13 == book_id:
+                self.book_repo.update_booking_time(book_id, None)
+            else:
+                raise errors.WrongUser(id=book_id)
         else:
-            raise errors.NotAvailable(id=book_id)
+            raise errors.UserHasNotBook()
 
     @join_point
     @validate_arguments
-    def take_book(self, book_id: int, user_id: int):
+    def take_book(self, book_id: int, user_id: int, period: int = 7):
         book = self.book_repo.get_by_id(book_id)
         if not book:
             raise errors.NoBook(id=book_id)
-        if isinstance(self.get_active_book(user_id), str):
-            if book.booking_time is None or book.booking_time < datetime.utcnow():
-                time_of_book = datetime.utcnow() + timedelta(minutes=1)
+        if not self._is_user_has_book(user_id):
+            if book.booking_time is None or book.booking_time < datetime.utcnow() and book.bought is False:
+                time_of_book = datetime.utcnow() + timedelta(minutes=period)
                 book_history = BookHistoryInfo(
                     book_id=book_id,
                     user_id=user_id,
@@ -193,10 +186,26 @@ class Books:
 
     @join_point
     @validate_arguments
+    def buy_book(self, user_id: int, book_id: int):
+        last_book = self.get_history(user_id)[-1]
+        book = self.book_repo.get_by_id(last_book.book_id)
+        if not book:
+            raise errors.NoBook(id=book_id)
+        if self._is_user_has_book(user_id):
+            active_book = self.get_active_book(user_id)
+            if active_book.isbn13 == book_id:
+                self.book_repo.buy_book(book_id)
+            else:
+                raise errors.WrongUser(book_id=book_id)
+        else:
+            raise errors.UserHasNotBook()
+
+    @join_point
+    @validate_arguments
     def get_active_book(self, user_id: int) -> Union[Book, str]:
         last_book = self.get_history(user_id)[-1]
         book = self.book_repo.get_by_id(last_book.book_id)
-        if book.booking_time < datetime.utcnow() or book.booking_time is None:
+        if book.booking_time is None or book.booking_time < datetime.utcnow() or book.bought:
             return 'User has not active book'
         else:
             return book

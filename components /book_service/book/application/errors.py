@@ -5,6 +5,10 @@ class NoBook(AppError):
     msg_template = "No book with id '{id}'"
     code = 'books.no_book'
 
+class WrongBook(AppError):
+    msg_template = "Wrong book"
+    code = 'books.wrong_book'
+
 class WrongOper(AppError):
     msg_template = "Oper: '{oper}' is not available"
     code = 'books.no_oper'
@@ -13,10 +17,14 @@ class UserAlreadyHasBook(AppError):
     msg_template = "This user already has book"
     code = 'books.user_has_book'
 
+class UserHasNotBook(AppError):
+    msg_template = "This user has not any book"
+    code = 'books.user_has_not_book'
+
 class NotAvailable(AppError):
     msg_template = "With id '{id}' not available"
     code = 'books.not_available'
 
 class WrongUser(AppError):
-    msg_template = "User with id '{user_id}' has not book with id '{book_id}'"
+    msg_template = "User has not book with id '{book_id}'"
     code = 'books.wrong_user'

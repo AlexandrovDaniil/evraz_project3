@@ -14,10 +14,16 @@ class Books:
     def on_get_show_info(self, request, response):
         book = self.books.get_info(**request.params)
         response.media = {
-            'id': book.id,
+            'book id': book.isbn13,
             'title': book.title,
-            'author': book.author,
-            'published year': book.published_year,
+            'subtitle': book.subtitle,
+            'authors': book.authors,
+            'pages': book.pages,
+            'price': book.price,
+            'publisher': book.publisher,
+            'description': book.desc,
+            'published year': book.year,
+            'booking time': book.booking_time.strftime('%Y-%m-%d %H:%M:%S') if book.booking_time else None,
         }
 
     @join_point
@@ -75,16 +81,15 @@ class Books:
 
     @join_point
     # @authenticate
-    def on_post_return_book(self, request, response):
+    def on_get_return_book(self, request, response):
         # request.media['user_id'] = request.context.client.user_id
-        self.books.return_book(**request.media)
+        self.books.return_book(**request.params)
         response.media = {'status': 'ok'}
 
     @join_point
     # @authenticate
     def on_get_show_history(self, request, response):
         history_rows = self.books.get_history(**request.params)
-        print(type(history_rows))
         response.media = [{
             'id': history_row.id,
             'book_id': history_row.book_id,
@@ -94,13 +99,18 @@ class Books:
         } for history_row in history_rows]
 
     @join_point
+    def on_get_buy_book(self, request, response):
+        self.books.buy_book(**request.params)
+        response.media = {'status': 'ok'}
+
+    @join_point
     # @authenticate
-    def on_get_get_active_book(self, request, response):
+    def on_get_active_book(self, request, response):
         book = self.books.get_active_book(**request.params)
         if isinstance(book, str):
             response.media = book
         else:
-            response.media = [{
+            response.media = {
                 'book id': book.isbn13,
                 'title': book.title,
                 'subtitle': book.subtitle,
@@ -111,4 +121,4 @@ class Books:
                 'description': book.desc,
                 'published year': book.year,
                 'booking time': book.booking_time.strftime('%Y-%m-%d %H:%M:%S') if book.booking_time else None,
-            }]
+            }

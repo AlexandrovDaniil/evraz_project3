@@ -24,7 +24,7 @@ class BooksRepo(BaseRepository, interfaces.BooksRepo):
         self.session.flush()
 
     def get_all(self) -> List[Book]:
-        query = select(BOOK)
+        query = select(BOOK).where(BOOK.c.bought == False)
         return self.session.execute(query).fetchall()
 
     def delete_instance(self, book_id: int):
@@ -38,6 +38,10 @@ class BooksRepo(BaseRepository, interfaces.BooksRepo):
     def get_history(self, user_id: int) -> List[BookHistory]:
         query = select(BOOK_HISTORY).where(BOOK_HISTORY.c.user_id == user_id)
         return self.session.execute(query).fetchall()
+
+    def buy_book(self, book_id: int):
+        query = update(BOOK).where(BOOK.c.isbn13 == book_id).values(bought=True)
+        return self.session.execute(query)
 
     def return_book(self, history_row: BookHistory):
         self.session.add(history_row)

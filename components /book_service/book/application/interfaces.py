@@ -32,6 +32,9 @@ class BooksRepo(ABC):
     def get_history(self, user_id: int) -> List[BookHistory]: ...
 
     @abstractmethod
+    def buy_book(self, book_id: int): ...
+
+    @abstractmethod
     def get_by_filter(self, authors: str, publisher: str, title: str) -> Optional[List[Book]]: ...
 
     @abstractmethod

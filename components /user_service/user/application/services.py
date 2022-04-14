@@ -79,3 +79,7 @@ class Users:
     def get_all(self) -> List[User]:
         users = self.user_repo.get_all()
         return users
+
+    @staticmethod
+    def send_message(data: dict):
+        print(data)

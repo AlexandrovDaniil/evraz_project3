@@ -67,74 +67,56 @@ class Books:
     @join_point
     @validate_arguments
     def add_book(self, tags: tuple):
-        books_ids = []
-        new_book_list = []
+        books_ids = {}
+        new_books = {}
         for tag in tags:
+            books_ids[tag] = []
             r = requests.get(f'https://api.itbook.store/1.0/search/{tag}').json()
             page_count = (int(r['total']) // 10) + (1 if int(r['total']) % 10 != 0 else 0)
             page_count = page_count if page_count < 5 else 5
             for i in range(1, page_count + 1):
                 book_page = requests.get(f'https://api.itbook.store/1.0/search/{tag}/{i}').json()
                 for book in book_page['books']:
-                    books_ids.append(book['isbn13'])
-        for book_id in books_ids:
-            book = requests.get(f'https://api.itbook.store/1.0/books/{book_id}').json()
-            new_book_list.append(book)
-            book['price'] = float(book['price'][1:])
-            book_info = BookInfo(
-                title=book['title'],
-                subtitle=book['subtitle'],
-                authors=book['authors'],
-                publisher=book['publisher'],
-                isbn10=book['isbn10'],
-                isbn13=book['isbn13'],
-                pages=book['pages'],
-                year=book['year'],
-                rating=book['rating'],
-                desc=book['desc'],
-                price=book['price'],
-                language=book['language']
-            )
-            book = book_info.create_obj(Book)
-            self.book_repo.add_instance(book)
+                    books_ids[tag].append(book['isbn13'])
+                    # books_ids.append(book['isbn13'])
+        top_tags = {}
+        for tag in books_ids:
+            new_books[tag] = []
+            for book_id in books_ids[tag]:
+                book = requests.get(f'https://api.itbook.store/1.0/books/{int(book_id)}').json()
+                book['price'] = float(book['price'][1:])
+                book_info = BookInfo(
+                    title=book['title'],
+                    subtitle=book['subtitle'],
+                    authors=book['authors'],
+                    publisher=book['publisher'],
+                    isbn10=book['isbn10'],
+                    isbn13=book['isbn13'],
+                    pages=book['pages'],
+                    year=book['year'],
+                    rating=book['rating'],
+                    desc=book['desc'],
+                    price=book['price'],
+                    language=book['language']
+                )
+                new_book = book_info.create_obj(Book)
+                self.book_repo.add_instance(new_book)
+                new_books[tag].append(book)
 
-        top_list = sorted(new_book_list, key=lambda x: (x['rating'], -int(x['year'])), reverse=True)[:3]
-        for i in top_list:
-            print(i['title'], i['rating'], i['year'])
+            new_books[tag] = sorted(new_books[tag], key=lambda x: (x['rating'], -int(x['year'])), reverse=True)[:3]
+        self._send_top_to_user(new_books)
+
+    def _send_top_to_user(self, top_books: dict):
+        self.publisher.publish(Message('Top3ApiExchange', {'data': top_books}))
 
     @join_point
     @validate_arguments
     def search_by_filter(self, filter_data: dict):
-
-        # if 'order_by' in filter_data:
-        #     order_by = filter_data.pop('order_by')
-        # else:
-        #     order_by = None
-        # if 'authors' not in filter_data:
-        #     filter_data['authors'] = '%'
-        # if 'publisher' not in filter_data:
-        #     filter_data['publisher'] = '%'
-        # if 'title' not in filter_data:
-        #     filter_data['title'] = '%'
-        #
-        # if 'price' not in filter_data:
-        #     res = self.book_repo.get_by_filter(**filter_data)
-        #
-        # else:
         price = filter_data['price']
         oper, val = price.split(':')
         if oper not in ('lt, gt, lte, gte, eq'):
             raise errors.WrongOper(oper=oper)
-        #     val = int(val)
-        #     res = self.book_repo.get_by_filter_price(filter_data['authors'], filter_data['publisher'],
-        #                                              filter_data['title'], oper, val)
-
         res = self.book_repo.get_by_filter(filter_data)
-        # if order_by == 'price':
-        #     return sorted(res, key=lambda x: (x['price']), reverse=True)
-        # elif order_by == 'pages':
-        #     return sorted(res, key=lambda x: (x['pages']), reverse=True)
-
         return res
 
     @join_point

@@ -23,25 +23,23 @@ class DB:
     users_repo = database.repositories.UsersRepo(context=context)
 
 
-class MessageBus:
-    connection = Connection(Settings.message_bus.BROKER_URL)
-    print(connection)
-    message_bus.broker_scheme.declare(connection)
-
-    publisher = KombuPublisher(
-        connection=connection,
-        scheme=message_bus.broker_scheme,
-    )
-
-
 class Application:
     is_dev_mode = Settings.user_api.IS_DEV_MODE
-    users = services.Users(user_repo=DB.users_repo, publisher=MessageBus.publisher, )
+    users = services.Users(user_repo=DB.users_repo)
+
+
+class MessageBus:
+    connection = Connection(Settings.message_bus.BROKER_URL)
+    consumer = message_bus.create_consumer(connection, Application.users)
+
+    @staticmethod
+    def declare_scheme():
+        message_bus.broker_scheme.declare(MessageBus.connection)
 
 
 class Aspects:
     services.join_points.join(DB.context)
-    user_api.join_points.join(MessageBus.publisher, DB.context)
+    user_api.join_points.join(DB.context)
 
 
 app = user_api.create_app(

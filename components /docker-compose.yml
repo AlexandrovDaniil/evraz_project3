@@ -25,21 +25,39 @@ services:
     volumes:
       - "rabbitmq_data:/data"
 
-#  user_backend:
-#    build:
-#      context: ./user_backend
-#      dockerfile: Dockerfile
-#    ports:
-#      - "1234:1234"
-#    environment:
-#      - POSTGRES_DB_HOST=postgresdb
-#      - RABBITMQ_USER=user
-#      - RABBITMQ_PASSWORD=password
-#      - RABBITMQ_HOST=rabbitmq
-#    depends_on:
-#      - postgresdb
-#      - rabbitmq
-#    restart: unless-stopped
+  user_service:
+    build:
+      context: ./user_service
+      dockerfile: Dockerfile
+    ports:
+      - "1234:1234"
+    environment:
+      - POSTGRES_DB_HOST=postgresdb
+      - RABBITMQ_USER=user
+      - RABBITMQ_PASSWORD=password
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - postgresdb
+      - rabbitmq
+    restart: unless-stopped
+    command:
+      "entrypoint_service.sh"
+
+  user_consumer:
+    build:
+      context: ./user_service
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_DB_HOST=postgresdb
+      - RABBITMQ_USER=user
+      - RABBITMQ_PASSWORD=password
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - postgresdb
+      - rabbitmq
+    restart: unless-stopped
+    command:
+      "entrypoint_cons.sh"
 
   book_service:
     build:
@@ -75,24 +93,7 @@ services:
     restart: unless-stopped
     command:
       "entrypoint_cons.sh"
-#  issue_backend:
-#    build:
-#      context: ./issue_backend
-#      dockerfile: Dockerfile
-#    ports:
-#      - "1236:1236"
-#    environment:
-#      - POSTGRES_DB_HOST=postgresdb
-#      - RABBITMQ_USER=user
-#      - RABBITMQ_PASSWORD=password
-#      - RABBITMQ_HOST=rabbitmq
-#    depends_on:
-#      - postgresdb
-#      - rabbitmq
-#    restart: unless-stopped
-#
-#
-#
+
   nginx:
     build:
       context: ./nginx
@@ -101,9 +102,9 @@ services:
       - "80:80"
       - "443:443"
     depends_on:
-#      - user_backend
+      - user_service
       - book_service
-#      - issue_backend
+
 
 volumes:
   rabbitmq_data:

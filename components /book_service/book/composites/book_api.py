@@ -37,6 +37,15 @@ class Application:
     books = services.Books(book_repo=DB.books_repo, publisher=MessageBus.publisher)
 
 
+class MessageBusCons:
+    connection = Connection(Settings.message_bus.BROKER_URL)
+    consumer = message_bus.create_consumer(connection, Application.books)
+
+    @staticmethod
+    def declare_scheme():
+        message_bus.broker_scheme.declare(MessageBusCons.connection)
+
+
 class Aspects:
     services.join_points.join(DB.context)
     book_api.join_points.join(MessageBus.publisher, DB.context)

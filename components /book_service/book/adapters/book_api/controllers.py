@@ -10,7 +10,7 @@ class Books:
     books: services.Books
 
     @join_point
-    @authenticate
+    # @authenticate
     def on_get_show_info(self, request, response):
         book = self.books.get_info(**request.params)
         response.media = {

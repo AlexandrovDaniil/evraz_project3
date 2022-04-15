@@ -18,8 +18,9 @@ class BooksRepo(BaseRepository, interfaces.BooksRepo):
         return result
 
     def add_instance(self, book: Book):
-        self.session.add(book)
-        self.session.flush()
+        if not self.session.query(BOOK).filter(BOOK.c.isbn13 == book.isbn13).one_or_none():
+            self.session.add(book)
+            self.session.flush()
 
     def get_all(self) -> List[Book]:
         query = select(BOOK).where(BOOK.c.bought == False)

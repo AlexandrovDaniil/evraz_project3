@@ -77,8 +77,7 @@ class Books:
                 book_page = requests.get(f'https://api.itbook.store/1.0/search/{tag}/{i}').json()
                 for book in book_page['books']:
                     books_ids[tag].append(book['isbn13'])
-                    # books_ids.append(book['isbn13'])
-        top_tags = {}
+
         for tag in books_ids:
             new_books[tag] = []
             for book_id in books_ids[tag]:
@@ -111,10 +110,11 @@ class Books:
     @join_point
     @validate_arguments
     def search_by_filter(self, filter_data: dict):
-        price = filter_data['price']
-        oper, val = price.split(':')
-        if oper not in ('lt, gt, lte, gte, eq'):
-            raise errors.WrongOper(oper=oper)
+        if 'price' in filter_data:
+            price = filter_data['price']
+            oper, val = price.split(':')
+            if oper not in ('lt, gt, lte, gte, eq'):
+                raise errors.WrongOper(oper=oper)
         res = self.book_repo.get_by_filter(filter_data)
         return res
 

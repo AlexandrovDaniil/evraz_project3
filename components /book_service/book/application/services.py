@@ -1,7 +1,9 @@
+import threading
 from datetime import datetime, timedelta
 from typing import Optional, List, Union
 
 import requests
+import attr
 from classic.app import DTO, validate_with_dto
 from classic.aspects import PointCut
 from classic.components import component
@@ -28,6 +30,8 @@ class BookInfo(DTO):
     desc: str
     price: int
     language: str
+    tag: str
+    timestamp: datetime
     bought: Optional[bool] = False
     booking_time: Optional[datetime] = None
 
@@ -55,6 +59,19 @@ class Books:
             return True
         return False
 
+    def _send_top_to_user(self, tags: tuple, timestamp: datetime):
+        top_books_by_tag = {}
+        for tag in tags:
+            res = []
+            top_books = self.book_repo.get_top_3(tag, timestamp)
+            for book in top_books:
+                prep_d = {'title': book.title,
+                          'rating': book.rating,
+                          'year': book.year}
+                res.append(prep_d)
+            top_books_by_tag[tag] = res
+        self.publisher.publish(Message('Top3ApiExchange', {'data': top_books_by_tag}))
+
     @join_point
     @validate_arguments
     def get_info(self, book_id: int):
@@ -67,45 +84,53 @@ class Books:
     @validate_arguments
     def add_book(self, tags: tuple):
         books_ids = {}
-        new_books = {}
+        threads = []
+        timestamp = datetime.utcnow()
         for tag in tags:
             books_ids[tag] = []
             r = requests.get(f'https://api.itbook.store/1.0/search/{tag}').json()
             page_count = (int(r['total']) // 10) + (1 if int(r['total']) % 10 != 0 else 0)
             page_count = page_count if page_count < 5 else 5
             for i in range(1, page_count + 1):
-                book_page = requests.get(f'https://api.itbook.store/1.0/search/{tag}/{i}').json()
-                for book in book_page['books']:
-                    books_ids[tag].append(book['isbn13'])
+                t = threading.Thread(target=self.thread_add, kwargs={'tag': tag, 'page': i, 'timestamp': timestamp})
+                t.start()
+                threads.append(t)
+            for thread in threads:
+                thread.join()
+        self._send_top_to_user(tags, timestamp)
 
-        for tag in books_ids:
-            new_books[tag] = []
-            for book_id in books_ids[tag]:
-                book = requests.get(f'https://api.itbook.store/1.0/books/{int(book_id)}').json()
-                book['price'] = float(book['price'][1:])
-                book_info = BookInfo(
-                    title=book['title'],
-                    subtitle=book['subtitle'],
-                    authors=book['authors'],
-                    publisher=book['publisher'],
-                    isbn10=book['isbn10'],
-                    isbn13=book['isbn13'],
-                    pages=book['pages'],
-                    year=book['year'],
-                    rating=book['rating'],
-                    desc=book['desc'],
-                    price=book['price'],
-                    language=book['language']
-                )
-                new_book = book_info.create_obj(Book)
-                self.book_repo.add_instance(new_book)
-                new_books[tag].append(book)
+    @join_point
+    @validate_arguments
+    def thread_add(self, tag: str, page: int, timestamp: datetime):
+        books_ids = []
+        book_page = requests.get(f'https://api.itbook.store/1.0/search/{tag}/{page}').json()
+        for book in book_page['books']:
+            books_ids.append(book['isbn13'])
+        for book_id in books_ids:
+            book = requests.get(f'https://api.itbook.store/1.0/books/{int(book_id)}').json()
+            book['price'] = float(book['price'][1:])
+            book_info = BookInfo(
+                title=book['title'],
+                subtitle=book['subtitle'],
+                authors=book['authors'],
+                publisher=book['publisher'],
+                isbn10=book['isbn10'],
+                isbn13=book['isbn13'],
+                pages=book['pages'],
+                year=book['year'],
+                rating=book['rating'],
+                desc=book['desc'],
+                price=book['price'],
+                language=book['language'],
+                tag=tag,
+                timestamp=timestamp
+            )
+            new_book = book_info.create_obj(Book)
+            self.book_repo.add_instance(new_book)
+            # new_books[tag].append(book)
 
-            new_books[tag] = sorted(new_books[tag], key=lambda x: (x['rating'], -int(x['year'])), reverse=True)[:3]
-        self._send_top_to_user(new_books)
-
-    def _send_top_to_user(self, top_books: dict):
-        self.publisher.publish(Message('Top3ApiExchange', {'data': top_books}))
+            # new_books[tag] = sorted(new_books[tag], key=lambda x: (x['rating'], -int(x['year'])), reverse=True)[:3]
+        # self._send_top_to_user(new_books)
 
     @join_point
     @validate_arguments
@@ -113,8 +138,8 @@ class Books:
         if 'price' in filter_data:
             price = filter_data['price']
             oper, val = price.split(':')
-            if oper not in ('lt, gt, lte, gte, eq'):
-                raise errors.WrongOper(oper=oper)
+            if oper not in ('lt, gt, lte, gte, eq') or not isinstance(val, (int, float)):
+                raise errors.WrongOperOrValue()
         res = self.book_repo.get_by_filter(filter_data)
         return res
 

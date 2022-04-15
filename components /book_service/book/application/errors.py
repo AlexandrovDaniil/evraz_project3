@@ -9,8 +9,8 @@ class WrongBook(AppError):
     msg_template = "Wrong book"
     code = 'books.wrong_book'
 
-class WrongOper(AppError):
-    msg_template = "Oper: '{oper}' is not available"
+class WrongOperOrValue(AppError):
+    msg_template = "Oper or value is not available"
     code = 'books.no_oper'
 
 class UserAlreadyHasBook(AppError):

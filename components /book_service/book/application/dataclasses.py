@@ -18,6 +18,8 @@ class Book:
     desc: str
     price: int
     language: str
+    tag: str
+    timestamp: datetime
     bought: Optional[bool] = False
     booking_time: Optional[datetime] = None
 

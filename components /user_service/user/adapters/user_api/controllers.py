@@ -16,7 +16,7 @@ class Users:
     @join_point
     # @authenticate
     def on_get_show_info(self, request, response):
-        request.params['id'] = request.context.client.user_id
+        # request.params['id'] = request.context.client.user_id
         user = self.users.get_info(**request.params)
         response.media = {
             'user id': user.id,

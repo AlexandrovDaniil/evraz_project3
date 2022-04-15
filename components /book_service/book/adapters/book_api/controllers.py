@@ -15,6 +15,7 @@ class Books:
         book = self.books.get_info(**request.params)
         response.media = {
             'book id': book.isbn13,
+            'tag': book.tag,
             'title': book.title,
             'subtitle': book.subtitle,
             'authors': book.authors,
@@ -38,6 +39,7 @@ class Books:
         books = self.books.get_all()
         response.media = [{
             'book id': book.isbn13,
+            'tag': book.tag,
             'title': book.title,
             'subtitle': book.subtitle,
             'authors': book.authors,
@@ -55,6 +57,7 @@ class Books:
         books = self.books.search_by_filter(request.params)
         response.media = [{
             'book id': book.isbn13,
+            'tag': book.tag,
             'title': book.title,
             'subtitle': book.subtitle,
             'authors': book.authors,
@@ -112,6 +115,7 @@ class Books:
         else:
             response.media = {
                 'book id': book.isbn13,
+                'tag': book.tag,
                 'title': book.title,
                 'subtitle': book.subtitle,
                 'authors': book.authors,

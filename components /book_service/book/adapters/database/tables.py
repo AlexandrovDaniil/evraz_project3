@@ -18,6 +18,7 @@ BOOK = Table(
     Column('authors', String(350)),
     Column('publisher', String(350)),
     Column('isbn10', String(35)),
+    Column('tag', String(35)),
     Column('pages', Integer),
     Column('year', Integer),
     Column('rating', Integer),
@@ -25,6 +26,7 @@ BOOK = Table(
     Column('price', Float),
     Column('bought', Boolean, default=False),
     Column('booking_time', DateTime, default=None),
+    Column('timestamp', DateTime),
     Column('language', String(50)),
 )
 

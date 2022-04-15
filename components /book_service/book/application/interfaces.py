@@ -34,4 +34,7 @@ class BooksRepo(ABC):
     @abstractmethod
     def get_by_filter(self, filter_data: dict) -> Optional[List[Book]]: ...
 
+    @abstractmethod
+    def get_top_3(self, tag:str, timestamp: datetime) -> Optional[List[Book]]: ...
+
 

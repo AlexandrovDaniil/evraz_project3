@@ -6,7 +6,7 @@ from book.application.dataclasses import Book, BookHistory
 from .tables import BOOK, BOOK_HISTORY
 from classic.components import component
 from classic.sql_storage import BaseRepository
-from sqlalchemy import delete, select, insert, update, desc, or_
+from sqlalchemy import delete, select, insert, update, desc, or_, and_
 
 
 @component
@@ -95,3 +95,10 @@ class BooksRepo(BaseRepository, interfaces.BooksRepo):
             elif filter_data['order_by'] == 'pages':
                 query = query.order_by(BOOK.c.pages.desc())
         return query
+
+    def get_top_3(self, tag: str, timestamp: datetime) -> Optional[List[Book]]:
+        # query = select(BOOK).filter(and_(BOOK.c.tag == tag, BOOK.c.timestamp == timestamp)). \
+        #     order_by(BOOK.c.rating.desc(), BOOK.c.year.asc()).limit(3)
+        query = self.session.query(BOOK).filter(and_(BOOK.c.tag == tag, BOOK.c.timestamp == timestamp)). \
+            order_by(BOOK.c.rating.desc(), BOOK.c.year.asc()).limit(3)
+        return query.all()

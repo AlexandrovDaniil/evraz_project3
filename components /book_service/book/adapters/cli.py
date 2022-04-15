@@ -20,4 +20,4 @@ def create_cli(publisher, MessageBusCons):
     return cli
 # book_service get-books azure
 # book_service get-books actionscript azure
-# book_service get-books mongo azure
+# book_service get-books mongo azure ios 1:08/0:10

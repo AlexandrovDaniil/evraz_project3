@@ -26,10 +26,6 @@ class BooksRepo(BaseRepository, interfaces.BooksRepo):
         query = select(BOOK).where(BOOK.c.bought == False)
         return self.session.execute(query).fetchall()
 
-    def delete_instance(self, book_id: int):
-        query = BOOK.delete().where(BOOK.c.id == book_id)
-        return self.session.execute(query)
-
     def update_booking_time(self, book_id: int, booking_time: Optional[datetime]):
         query = update(BOOK).where(BOOK.c.isbn13 == book_id).values(booking_time=booking_time)
         return self.session.execute(query)
@@ -38,9 +34,14 @@ class BooksRepo(BaseRepository, interfaces.BooksRepo):
         query = select(BOOK_HISTORY).where(BOOK_HISTORY.c.user_id == user_id)
         return self.session.execute(query).fetchall()
 
+    def get_last_history_row(self, user_id: int) -> BookHistory:
+        query = self.session.query(BOOK_HISTORY).filter(BOOK_HISTORY.c.user_id == user_id).\
+            order_by(BOOK_HISTORY.c.id.desc()).first()
+        return query
+
     def buy_book(self, book_id: int):
         query = update(BOOK).where(BOOK.c.isbn13 == book_id).values(bought=True)
-        return self.session.execute(query)
+        self.session.execute(query)
 
     def take_book(self, history_row: BookHistory):
         self.session.add(history_row)
@@ -62,9 +63,13 @@ class BooksRepo(BaseRepository, interfaces.BooksRepo):
             query = query.filter(BOOK.c.authors.ilike(f'%{authors}%'))
         if 'publisher' in filter_data:
             publisher = filter_data['publisher']
+            if isinstance(filter_data['publisher'], list):
+                publisher = ','.join(publisher)
             query = query.filter(BOOK.c.publisher.ilike(f'%{publisher}%'))
         if 'keyword' in filter_data:
             keyword = filter_data['keyword']
+            if isinstance(filter_data['keyword'], list):
+                keyword = ','.join(keyword)
             query = query.filter(or_(BOOK.c.title.ilike(f'%{keyword}%'),
                                      BOOK.c.desc.ilike(f'%{keyword}%'),
                                      BOOK.c.subtitle.ilike(f'%{keyword}%')))
@@ -97,8 +102,6 @@ class BooksRepo(BaseRepository, interfaces.BooksRepo):
         return query
 
     def get_top_3(self, tag: str, timestamp: datetime) -> Optional[List[Book]]:
-        # query = select(BOOK).filter(and_(BOOK.c.tag == tag, BOOK.c.timestamp == timestamp)). \
-        #     order_by(BOOK.c.rating.desc(), BOOK.c.year.asc()).limit(3)
         query = self.session.query(BOOK).filter(and_(BOOK.c.tag == tag, BOOK.c.timestamp == timestamp)). \
             order_by(BOOK.c.rating.desc(), BOOK.c.year.asc()).limit(3)
         return query.all()

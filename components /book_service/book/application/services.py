@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from typing import Optional, List, Union
 
 import requests
-import attr
+
 from classic.app import DTO, validate_with_dto
 from classic.aspects import PointCut
 from classic.components import component
@@ -50,12 +50,17 @@ class Books:
     publisher: Optional[Publisher] = None
 
     def _is_user_has_book(self, user_id: int) -> bool:
-        history = self.get_history(user_id)
-        if history:
-            last_row = history[-1]
-            last_book = self.book_repo.get_by_id(last_row.book_id)
+        history_row = self.book_repo.get_last_history_row(user_id)
+        if history_row:
+            last_book = self.book_repo.get_by_id(history_row.book_id)
             if last_book.booking_time is None or last_book.booking_time < datetime.utcnow() or last_book.bought:
                 return False
+            return True
+        return False
+
+    def _is_book_exists(self, book_id):
+        book = self.book_repo.get_by_id(book_id)
+        if book:
             return True
         return False
 
@@ -83,11 +88,9 @@ class Books:
     @join_point
     @validate_arguments
     def add_book(self, tags: tuple):
-        books_ids = {}
         threads = []
         timestamp = datetime.utcnow()
         for tag in tags:
-            books_ids[tag] = []
             r = requests.get(f'https://api.itbook.store/1.0/search/{tag}').json()
             page_count = (int(r['total']) // 10) + (1 if int(r['total']) % 10 != 0 else 0)
             page_count = page_count if page_count < 5 else 5
@@ -127,14 +130,10 @@ class Books:
             )
             new_book = book_info.create_obj(Book)
             self.book_repo.add_instance(new_book)
-            # new_books[tag].append(book)
-
-            # new_books[tag] = sorted(new_books[tag], key=lambda x: (x['rating'], -int(x['year'])), reverse=True)[:3]
-        # self._send_top_to_user(new_books)
 
     @join_point
     @validate_arguments
-    def search_by_filter(self, filter_data: dict):
+    def search_by_filter(self, filter_data: dict) -> Optional[List[Book]]:
         if 'price' in filter_data:
             price = filter_data['price']
             oper, val = price.split(':')
@@ -156,8 +155,7 @@ class Books:
     @join_point
     @validate_arguments
     def return_book(self, book_id: int, user_id: int):
-        book = self.book_repo.get_by_id(book_id)
-        if not book:
+        if not self._is_book_exists(book_id):
             raise errors.NoBook(id=book_id)
         if self._is_user_has_book(user_id):
             active_book = self.get_active_book(user_id)
@@ -195,13 +193,11 @@ class Books:
     @join_point
     @validate_arguments
     def buy_book(self, user_id: int, book_id: int):
-        last_book = self.get_history(user_id)[-1]
-        book = self.book_repo.get_by_id(last_book.book_id)
-        if not book:
+        last_book = self.book_repo.get_last_history_row(user_id)
+        if not self._is_book_exists(book_id):
             raise errors.NoBook(id=book_id)
         if self._is_user_has_book(user_id):
-            active_book = self.get_active_book(user_id)
-            if active_book.isbn13 == book_id:
+            if last_book.book_id == book_id:
                 self.book_repo.buy_book(book_id)
             else:
                 raise errors.WrongUser(book_id=book_id)
@@ -211,7 +207,7 @@ class Books:
     @join_point
     @validate_arguments
     def get_active_book(self, user_id: int) -> Union[Book, str]:
-        last_book = self.get_history(user_id)[-1]
+        last_book = self.book_repo.get_last_history_row(user_id)
         book = self.book_repo.get_by_id(last_book.book_id)
         if book.booking_time is None or book.booking_time < datetime.utcnow() or book.bought:
             return 'User has not active book'

@@ -18,7 +18,7 @@ class UserAlreadyHasBook(AppError):
     code = 'books.user_has_book'
 
 class UserHasNotBook(AppError):
-    msg_template = "This user has not any book"
+    msg_template = "This user has not active book"
     code = 'books.user_has_not_book'
 
 class NotAvailable(AppError):

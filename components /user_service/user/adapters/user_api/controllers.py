@@ -14,7 +14,7 @@ class Users:
     users: services.Users
 
     @join_point
-    @authenticate
+    # @authenticate
     def on_get_show_info(self, request, response):
         request.params['id'] = request.context.client.user_id
         user = self.users.get_info(**request.params)
@@ -37,7 +37,7 @@ class Users:
         response.media = token
 
     @join_point
-    @authenticate
+    # @authenticate
     def on_get_show_all(self, request, response):
         users = self.users.get_all()
         response.media = [{'id': user.id,
@@ -46,7 +46,7 @@ class Users:
                           for user in users]
 
     @join_point
-    @authenticate
+    # @authenticate
     def on_get_delete_user(self, request, response):
         request.params['id'] = request.context.client.user_id
         self.users.delete_user(**request.params)

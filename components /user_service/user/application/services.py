@@ -38,15 +38,6 @@ class Users:
     def add_user(self, user_info: UserInfo):
         new_user = user_info.create_obj(User)
         new_user = self.user_repo.add_instance(new_user)
-        # if self.publisher:
-        #     self.publisher.plan(
-        #         Message('ApiExchange',
-        #                 {'obj_type': 'user',
-        #                  'action': 'create',
-        #                  'data': {'id_user': new_user.id,
-        #                           'name': new_user.user_name}
-        #                  })
-        #     )
         return new_user
 
     @join_point
@@ -60,26 +51,18 @@ class Users:
         else:
             raise errors.WrongUserPassword()
 
-    # @join_point
-    # @validate_arguments
-    # def delete_user(self, id: int):
-    #     user = self.user_repo.get_by_id(id)
-    #     if not user:
-    #         raise errors.NoUser(id=id)
-    #     self.user_repo.delete_instance(id)
-    #     if self.publisher:
-    #         self.publisher.plan(
-    #             Message('ApiExchange',
-    #                     {'obj_type': 'user',
-    #                      'action': 'delete',
-    #                      'data': {'id_user': id}})
-    #         )
-
     @join_point
     def get_all(self) -> List[User]:
         users = self.user_repo.get_all()
         return users
 
-    @staticmethod
-    def send_message(data: dict):
-        print(data)
+    def send_message(self, data: dict):
+        all_users = self.get_all()
+        if all_users:
+            for user in all_users:
+                print(f'Dear {user.user_name}, we have something to you!')
+                print(f'Here is our new books compilation:')
+                for tag in data:
+                    print(f'For tag {tag}:')
+                    for book in data[tag]:
+                        print(f'\t{book["title"]}, rating: {book["rating"]}, publish year: {book["year"]}')

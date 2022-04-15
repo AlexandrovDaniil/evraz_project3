@@ -18,6 +18,6 @@ def create_cli(publisher, MessageBusCons):
         MessageBusCons.consumer.run()
 
     return cli
-# book_service get-books 'azure'
-# book_service get-books 'actionscript' 'azure'
+# book_service get-books azure
+# book_service get-books actionscript azure
 # book_service get-books mongo azure

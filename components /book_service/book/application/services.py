@@ -57,10 +57,10 @@ class Books:
 
     @join_point
     @validate_arguments
-    def get_info(self, id: int):
-        book = self.book_repo.get_by_id(id)
+    def get_info(self, book_id: int):
+        book = self.book_repo.get_by_id(book_id)
         if not book:
-            raise errors.NoBook(id=id)
+            raise errors.NoBook(id=book_id)
         return book
 
     @join_point

@@ -21,18 +21,11 @@ class Book:
     bought: Optional[bool] = False
     booking_time: Optional[datetime] = None
 
-    # image: Optional[str] = None
-    # error: Optional[str] = None
-    # url: Optional[str] = None
-    # id: Optional[int] = None
-    # pdf: Optional[dict] = None
-
 
 @attr.dataclass
 class BookHistory:
     book_id: int
     user_id: int
     action: str
-    booking_time: datetime \
-        # = attr.ib(factory=lambda: datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+    booking_time: datetime
     id: Optional[int] = None

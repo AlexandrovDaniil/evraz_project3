@@ -1,8 +1,6 @@
 from datetime import datetime
 from typing import List, Optional, Union
 
-from sqlalchemy.orm import aliased
-
 from book.application import interfaces
 from book.application.dataclasses import Book, BookHistory
 from .tables import BOOK, BOOK_HISTORY
@@ -43,24 +41,11 @@ class BooksRepo(BaseRepository, interfaces.BooksRepo):
         query = update(BOOK).where(BOOK.c.isbn13 == book_id).values(bought=True)
         return self.session.execute(query)
 
-    def return_book(self, history_row: BookHistory):
-        self.session.add(history_row)
-        self.session.flush()
-        # query = update(BOOK).where(BOOK.c.id == book_id).values(user_id=None)
-        # return self.session.execute(query)
-
     def take_book(self, history_row: BookHistory):
-        # query = update(BOOK).where(BOOK.c.id == book_id).values(user_id=user_id)
-        # return self.session.execute(query)
         self.session.add(history_row)
         self.session.flush()
 
-    # def get_by_filter(self, authors: str, publisher: str, title: str) -> Optional[List[Book]]:
     def get_by_filter(self, filter_data: dict) -> Optional[List[Book]]:
-        # result = self.session.query(BOOK).filter(BOOK.c.authors.like(f'%{authors}%')). \
-        #     filter(BOOK.c.publisher.like(f'%{publisher}%')). \
-        #     filter(BOOK.c.title.like(f'%{title}%')).all()
-        # return result
         query = self.session.query(BOOK)
         query = self.default_filters(filter_data, query)
         query = self.filter_price(filter_data, query)

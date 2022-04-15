@@ -12,7 +12,6 @@ metadata = MetaData(naming_convention=naming_convention)
 BOOK = Table(
     'book',
     metadata,
-    # Column('id', Integer, primary_key=True, autoincrement=True),
     Column('isbn13', BigInteger, primary_key=True, autoincrement=True),
     Column('title', String(500)),
     Column('subtitle', String(500)),
@@ -35,7 +34,6 @@ BOOK_HISTORY = Table(
     'book_history',
     metadata,
     Column('id', Integer, primary_key=True, autoincrement=True),
-    # Column('book_id', BigInteger, ForeignKey('book.isbn13')),
     Column('book_id', BigInteger),
     Column('booking_time', DateTime),
     Column('user_id', Integer),

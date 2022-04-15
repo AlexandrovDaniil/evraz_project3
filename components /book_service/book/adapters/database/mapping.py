@@ -7,13 +7,5 @@ mapper = registry()
 
 mapper.map_imperatively(dataclasses.Book, tables.BOOK)
 
-mapper.map_imperatively(dataclasses.BookHistory,
-                        tables.BOOK_HISTORY,
-                        # properties={
-                        #     'isbn13': relationship(
-                        #         dataclasses.Book,
-                        #         lazy='subquery',
-                        #     )
-                        # }
-                        )
+mapper.map_imperatively(dataclasses.BookHistory, tables.BOOK_HISTORY)
 

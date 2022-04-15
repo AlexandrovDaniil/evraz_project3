@@ -36,8 +36,7 @@ class BookHistoryInfo(DTO):
     book_id: int
     user_id: int
     action: str
-    booking_time: datetime \
-        # = attr.ib(factory=lambda: datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+    booking_time: datetime
     id: Optional[int] = None
 
 

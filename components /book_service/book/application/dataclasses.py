@@ -16,7 +16,7 @@ class Book:
     year: int
     rating: int
     desc: str
-    price: int
+    price: float
     language: str
     tag: str
     timestamp: datetime

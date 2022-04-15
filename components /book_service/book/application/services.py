@@ -28,7 +28,7 @@ class BookInfo(DTO):
     year: int
     rating: int
     desc: str
-    price: int
+    price: float
     language: str
     tag: str
     timestamp: datetime
@@ -58,7 +58,7 @@ class Books:
             return True
         return False
 
-    def _is_book_exists(self, book_id):
+    def _is_book_exists(self, book_id) -> bool:
         book = self.book_repo.get_by_id(book_id)
         if book:
             return True
@@ -87,7 +87,7 @@ class Books:
 
     @join_point
     @validate_arguments
-    def add_book(self, tags: tuple):
+    def parse_message(self, tags: tuple):
         threads = []
         timestamp = datetime.utcnow()
         for tag in tags:
@@ -95,7 +95,7 @@ class Books:
             page_count = (int(r['total']) // 10) + (1 if int(r['total']) % 10 != 0 else 0)
             page_count = page_count if page_count < 5 else 5
             for i in range(1, page_count + 1):
-                t = threading.Thread(target=self.thread_add, kwargs={'tag': tag, 'page': i, 'timestamp': timestamp})
+                t = threading.Thread(target=self.add_book, kwargs={'tag': tag, 'page': i, 'timestamp': timestamp})
                 t.start()
                 threads.append(t)
             for thread in threads:
@@ -104,7 +104,7 @@ class Books:
 
     @join_point
     @validate_arguments
-    def thread_add(self, tag: str, page: int, timestamp: datetime):
+    def add_book(self, tag: str, page: int, timestamp: datetime):
         books_ids = []
         book_page = requests.get(f'https://api.itbook.store/1.0/search/{tag}/{page}').json()
         for book in book_page['books']:
@@ -148,6 +148,7 @@ class Books:
         return books
 
     @join_point
+    @validate_arguments
     def get_history(self, user_id: int) -> List[BookHistory]:
         history_rows = self.book_repo.get_history(user_id)
         return history_rows
@@ -173,7 +174,7 @@ class Books:
         if not book:
             raise errors.NoBook(id=book_id)
         if not self._is_user_has_book(user_id):
-            if book.booking_time is None or book.booking_time < datetime.utcnow() and book.bought is False:
+            if (book.booking_time is None or book.booking_time < datetime.utcnow()) and book.bought is False:
                 time_of_book = datetime.utcnow() + timedelta(minutes=period)
                 book_history = BookHistoryInfo(
                     book_id=book_id,

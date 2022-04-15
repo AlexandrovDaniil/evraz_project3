@@ -35,7 +35,7 @@ class BooksRepo(BaseRepository, interfaces.BooksRepo):
         return self.session.execute(query).fetchall()
 
     def get_last_history_row(self, user_id: int) -> BookHistory:
-        query = self.session.query(BOOK_HISTORY).filter(BOOK_HISTORY.c.user_id == user_id).\
+        query = self.session.query(BOOK_HISTORY).filter(BOOK_HISTORY.c.user_id == user_id). \
             order_by(BOOK_HISTORY.c.id.desc()).first()
         return query
 

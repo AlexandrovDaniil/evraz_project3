@@ -14,7 +14,7 @@ def create_consumer(
     consumer = KombuConsumer(connection=connection, scheme=broker_scheme)
 
     consumer.register_function(
-        book.add_book,
+        book.parse_message,
         'TestApiQueue',
     )
 

@@ -21,7 +21,7 @@ def generate_token(user) -> str:
     token = jwt.encode({
         'sub': user.id,
         'login': user.login,
-        'name': user.user_name,
+        'name': user.name,
         'group': 'User'
 
     }, 'my_secret_jwt', algorithm='HS256')

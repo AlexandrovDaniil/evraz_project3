@@ -1,21 +1,20 @@
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from book.application import interfaces
 from book.application.dataclasses import Book, BookHistory
 from .tables import BOOK, BOOK_HISTORY
 from classic.components import component
 from classic.sql_storage import BaseRepository
-from sqlalchemy import delete, select, insert, update, desc, or_, and_
+from sqlalchemy import or_, and_
 
 
 @component
 class BooksRepo(BaseRepository, interfaces.BooksRepo):
 
     def get_by_id(self, book_id: int) -> Optional[Book]:
-        query = select(BOOK).where(BOOK.c.isbn13 == book_id)
-        result = self.session.execute(query).fetchone()
-        return result
+        query = self.session.query(BOOK).filter(BOOK.c.isbn13 == book_id)
+        return query.first()
 
     def add_instance(self, book: Book):
         if not self.session.query(BOOK).filter(BOOK.c.isbn13 == book.isbn13).one_or_none():
@@ -23,16 +22,16 @@ class BooksRepo(BaseRepository, interfaces.BooksRepo):
             self.session.flush()
 
     def get_all(self) -> List[Book]:
-        query = select(BOOK).where(BOOK.c.bought == False)
-        return self.session.execute(query).fetchall()
+        query = self.session.query(BOOK).filter(BOOK.c.bought == False)
+        return query.all()
 
     def update_booking_time(self, book_id: int, booking_time: Optional[datetime]):
-        query = update(BOOK).where(BOOK.c.isbn13 == book_id).values(booking_time=booking_time)
-        return self.session.execute(query)
+        self.session.query(BOOK).filter(BOOK.c.isbn13 == book_id).update({BOOK.c.booking_time: booking_time})
+        self.session.flush()
 
     def get_history(self, user_id: int) -> List[BookHistory]:
-        query = select(BOOK_HISTORY).where(BOOK_HISTORY.c.user_id == user_id)
-        return self.session.execute(query).fetchall()
+        query = self.session.query(BOOK_HISTORY).filter(BOOK_HISTORY.c.user_id == user_id)
+        return query.all()
 
     def get_last_history_row(self, user_id: int) -> BookHistory:
         query = self.session.query(BOOK_HISTORY).filter(BOOK_HISTORY.c.user_id == user_id). \
@@ -40,10 +39,10 @@ class BooksRepo(BaseRepository, interfaces.BooksRepo):
         return query
 
     def buy_book(self, book_id: int):
-        query = update(BOOK).where(BOOK.c.isbn13 == book_id).values(bought=True)
-        self.session.execute(query)
+        self.session.query(BOOK).filter(BOOK.c.isbn13 == book_id).update({BOOK.c.bought: True})
+        self.session.flush()
 
-    def take_book(self, history_row: BookHistory):
+    def add_books_history_row(self, history_row: BookHistory):
         self.session.add(history_row)
         self.session.flush()
 

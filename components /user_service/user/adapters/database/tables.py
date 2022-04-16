@@ -1,4 +1,3 @@
-
 from sqlalchemy import Column, ForeignKey, Integer, MetaData, String, Table
 
 naming_convention = {
@@ -15,7 +14,7 @@ USER = Table(
     'user',
     metadata,
     Column('id', Integer, primary_key=True, autoincrement=True),
-    Column('user_name', String),
-    Column('login', String),
-    Column('password', String)
+    Column('name', String(50)),
+    Column('login', String(50)),
+    Column('password', String(50))
 )

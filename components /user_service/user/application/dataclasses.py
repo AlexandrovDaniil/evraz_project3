@@ -5,7 +5,7 @@ import attr
 
 @attr.dataclass
 class User:
-    user_name: str
+    name: str
     login: str
     password: str
     id: Optional[int] = None

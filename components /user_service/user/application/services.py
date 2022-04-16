@@ -14,7 +14,7 @@ join_point = join_points.join_point
 
 
 class UserInfo(DTO):
-    user_name: str
+    name: str
     login: str
     password: str
     id: Optional[int]
@@ -27,18 +27,20 @@ class Users:
 
     @join_point
     @validate_arguments
-    def get_info(self, id: int):
-        user = self.user_repo.get_by_id(id)
+    def get_info(self, user_id: int):
+        user = self.user_repo.get_by_id(user_id)
         if not user:
-            raise errors.NoUser(id=id)
+            raise errors.NoUser(id=user_id)
         return user
 
     @join_point
     @validate_with_dto
     def add_user(self, user_info: UserInfo):
-        new_user = user_info.create_obj(User)
-        new_user = self.user_repo.add_instance(new_user)
-        return new_user
+        if not self.user_repo.get_by_login(user_info.login):
+            new_user = user_info.create_obj(User)
+            new_user = self.user_repo.add_instance(new_user)
+            return new_user
+        raise errors.LoginIsOccupied()
 
     @join_point
     @validate_arguments
@@ -60,7 +62,7 @@ class Users:
         all_users = self.get_all()
         if all_users:
             for user in all_users:
-                print(f'Dear {user.user_name}, we have something to you!')
+                print(f'Dear {user.name}, we have something to you!')
                 print(f'Here is our new books compilation:')
                 for tag in data:
                     print(f'For tag {tag}:')

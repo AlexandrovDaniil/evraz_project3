@@ -11,6 +11,12 @@ class NoUserLogin(AppError):
     code = 'user.no_user_login'
 
 
+class LoginIsOccupied(AppError):
+    msg_template = "This login is already occupied"
+    code = 'user.login_is_occupied'
+
+
 class WrongUserPassword(AppError):
     msg_template = "Wrong password"
     code = 'user.wrong_password'
+

@@ -64,17 +64,21 @@ class Books:
             return True
         return False
 
+    @validate_arguments
     def _send_top_to_user(self, tags: tuple, timestamp: datetime):
         top_books_by_tag = {}
         for tag in tags:
             res = []
             top_books = self.book_repo.get_top_3(tag, timestamp)
+            if not top_books:
+                raise errors.AnyNewBook()
             for book in top_books:
                 prep_d = {'title': book.title,
                           'rating': book.rating,
                           'year': book.year}
                 res.append(prep_d)
             top_books_by_tag[tag] = res
+
         self.publisher.publish(Message('Top3ApiExchange', {'data': top_books_by_tag}))
 
     @join_point
@@ -137,8 +141,8 @@ class Books:
         if 'price' in filter_data:
             price = filter_data['price']
             oper, val = price.split(':')
-            if oper not in ('lt, gt, lte, gte, eq') or not isinstance(val, (int, float)):
-                raise errors.WrongOperOrValue()
+            if oper not in ('lt, gt, lte, gte, eq'):
+                raise errors.WrongOper()
         res = self.book_repo.get_by_filter(filter_data)
         return res
 
@@ -163,7 +167,7 @@ class Books:
             if active_book.isbn13 == book_id:
                 self.book_repo.update_booking_time(book_id, None)
             else:
-                raise errors.WrongUser(id=book_id)
+                raise errors.WrongUser(book_id=book_id)
         else:
             raise errors.UserHasNotBook()
 
@@ -183,7 +187,7 @@ class Books:
                     booking_time=time_of_book
                 )
                 new_row_history = book_history.create_obj(BookHistory)
-                self.book_repo.take_book(new_row_history)
+                self.book_repo.add_books_history_row(new_row_history)
                 self.book_repo.update_booking_time(book_id, time_of_book)
 
             else:
@@ -207,10 +211,10 @@ class Books:
 
     @join_point
     @validate_arguments
-    def get_active_book(self, user_id: int) -> Union[Book, str]:
+    def get_active_book(self, user_id: int) -> Union[Book]:
         last_book = self.book_repo.get_last_history_row(user_id)
         book = self.book_repo.get_by_id(last_book.book_id)
         if book.booking_time is None or book.booking_time < datetime.utcnow() or book.bought:
-            return 'User has not active book'
+            raise errors.UserHasNotBook()
         else:
             return book

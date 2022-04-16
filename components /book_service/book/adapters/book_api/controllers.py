@@ -4,7 +4,7 @@ from classic.http_auth import authenticate, authenticator_needed
 from .join_points import join_point
 
 
-# @authenticator_needed
+@authenticator_needed
 @component
 class Books:
     books: services.Books
@@ -26,12 +26,6 @@ class Books:
             'published year': book.year,
             'booking time': book.booking_time.strftime('%Y-%m-%d %H:%M:%S') if book.booking_time else None,
         }
-
-    @join_point
-    @authenticate
-    def on_post_add_book(self, request, response):
-        self.books.add_book(**request.media)
-        response.media = {'status': 'book added'}
 
     @join_point
     # @authenticate
@@ -70,12 +64,6 @@ class Books:
         } for book in books]
 
     @join_point
-    @authenticate
-    def on_get_delete_book(self, request, response):
-        self.books.delete_book(**request.params)
-        response.media = {'status': 'book deleted'}
-
-    @join_point
     # @authenticate
     def on_post_take_book(self, request, response):
         # request.media['user_id'] = request.context.client.user_id
@@ -84,26 +72,29 @@ class Books:
 
     @join_point
     # @authenticate
-    def on_get_return_book(self, request, response):
+    def on_post_return_book(self, request, response):
         # request.media['user_id'] = request.context.client.user_id
-        self.books.return_book(**request.params)
+        self.books.return_book(**request.media)
         response.media = {'status': 'ok'}
 
     @join_point
     # @authenticate
     def on_get_show_history(self, request, response):
+        # request.params['user_id'] = request.context.client.user_id
         history_rows = self.books.get_history(**request.params)
         response.media = [{
             'id': history_row.id,
-            'book_id': history_row.book_id,
-            'user_id': history_row.user_id,
+            'book id': history_row.book_id,
+            'user id': history_row.user_id,
             'action': history_row.action,
             'booking time': history_row.booking_time.strftime('%Y-%m-%d %H:%M:%S'),
         } for history_row in history_rows]
 
     @join_point
-    def on_get_buy_book(self, request, response):
-        self.books.buy_book(**request.params)
+    # @authenticate
+    def on_post_buy_book(self, request, response):
+        # request.params['user_id'] = request.context.client.user_id
+        self.books.buy_book(**request.media)
         response.media = {'status': 'ok'}
 
     @join_point

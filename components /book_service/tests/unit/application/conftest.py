@@ -92,26 +92,7 @@ def wrong_time_bought():
         bought=False
     )
 
-@pytest.fixture(scope='function')
-def book_bought():
-    return dataclasses.Book(
-        isbn13=9781491954463,
-        tag="mongo",
-        title="ewq",
-        subtitle="Powerful and Scalable Data Storage",
-        authors="Shannon Bradshaw, Kristina Chodorow",
-        pages=514,
-        price=29.0,
-        publisher="O'Reilly Media",
-        desc="Manage your data with a system",
-        year=2021,
-        booking_time=None,
-        rating=5,
-        isbn10='12345678x',
-        language='English',
-        timestamp=datetime(2022, 4, 15, 20, 20, 20),
-        bought=True
-    )
+
 
 @pytest.fixture(scope='function')
 def book_bought():
@@ -133,6 +114,7 @@ def book_bought():
         timestamp=datetime(2022, 4, 15, 20, 20, 20),
         bought=True
     )
+
 
 @pytest.fixture(scope='function')
 def book_history():
@@ -153,7 +135,7 @@ def book_repo(book, book2, book3, book_history, wrong_time_bought, book_bought):
     book_repo.book_bought = Mock(return_value=book_bought)
     book_repo.add_instance = Mock()
     book_repo.get_all = Mock(return_value=[book, book2])
-    book_repo.take_book = Mock()
+    book_repo.add_books_history_row = Mock()
     book_repo.update_booking_time = Mock()
     book_repo.get_history = Mock(return_value=[book_history])
     book_repo.get_last_history_row = Mock(return_value=book_history)

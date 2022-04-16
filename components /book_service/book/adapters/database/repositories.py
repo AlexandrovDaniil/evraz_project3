@@ -47,7 +47,7 @@ class BooksRepo(BaseRepository, interfaces.BooksRepo):
         self.session.flush()
 
     def get_by_filter(self, filter_data: dict) -> Optional[List[Book]]:
-        query = self.session.query(BOOK)
+        query = self.session.query(BOOK).filter(BOOK.c.bought == False)
         query = self.default_filters(filter_data, query)
         query = self.filter_price(filter_data, query)
         query = self.sort_order_by(filter_data, query)

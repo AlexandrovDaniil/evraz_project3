@@ -1,10 +1,10 @@
 from book.adapters import book_api, database, message_bus
 from book.application import services
+from classic.messaging_kombu import KombuPublisher
 from classic.sql_storage import TransactionContext
+from kombu import Connection
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from kombu import Connection
-from classic.messaging_kombu import KombuPublisher
 
 
 class Settings:
@@ -34,7 +34,9 @@ class MessageBus:
 
 class Application:
     is_dev_mode = Settings.book_api.IS_DEV_MODE
-    books = services.Books(book_repo=DB.books_repo, publisher=MessageBus.publisher)
+    books = services.Books(
+        book_repo=DB.books_repo, publisher=MessageBus.publisher
+    )
 
 
 class MessageBusCons:
@@ -54,5 +56,4 @@ class Aspects:
 app = book_api.create_app(
     is_dev_mode=Application.is_dev_mode,
     books=Application.books,
-
 )

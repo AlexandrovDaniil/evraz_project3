@@ -3,6 +3,12 @@ from classic.messaging import Message
 
 
 def create_cli(publisher, MessageBusCons):
+    ''' book_service get-tags azure
+        book_service get-tags actionscript azure
+        book_service get-tags mongo azure ios 1:08/0:10
+        команды для добавления книг
+    '''
+
     @click.group()
     def cli():
         pass
@@ -18,6 +24,3 @@ def create_cli(publisher, MessageBusCons):
         MessageBusCons.consumer.run()
 
     return cli
-# book_service get-tags azure
-# book_service get-tags actionscript azure
-# book_service get-tags mongo azure ios 1:08/0:10

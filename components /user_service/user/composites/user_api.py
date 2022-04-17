@@ -1,11 +1,9 @@
-from user.adapters import user_api, database, message_bus, mail_sending
-from user.application import services
 from classic.sql_storage import TransactionContext
+from kombu import Connection
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
-from kombu import Connection
-
+from user.adapters import database, mail_sending, message_bus, user_api
+from user.application import services
 
 
 class Settings:
@@ -17,7 +15,6 @@ class Settings:
 class DB:
     engine = create_engine(Settings.db.DB_URL, echo=True)
     database.metadata.create_all(engine)
-
     context = TransactionContext(bind=engine)
     Session = sessionmaker(bind=engine)
     users_repo = database.repositories.UsersRepo(context=context)
@@ -53,5 +50,4 @@ class Aspects:
 app = user_api.create_app(
     is_dev_mode=Application.is_dev_mode,
     users=Application.users,
-
 )

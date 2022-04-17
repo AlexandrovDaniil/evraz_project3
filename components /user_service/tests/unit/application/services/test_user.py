@@ -2,9 +2,14 @@ from datetime import datetime
 
 import pytest
 from attr import asdict
-from user.application.services import Users
 from pydantic import ValidationError
-from user.application.errors import WrongUserPassword, NoUser, NoUserLogin, LoginIsOccupied
+from user.application.errors import (
+    LoginIsOccupied,
+    NoUser,
+    NoUserLogin,
+    WrongUserPassword,
+)
+from user.application.services import Users
 
 
 @pytest.fixture(scope='function')

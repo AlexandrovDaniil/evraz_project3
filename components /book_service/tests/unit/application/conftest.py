@@ -1,5 +1,6 @@
 from datetime import datetime
 from unittest.mock import Mock
+
 import pytest
 from book.application import dataclasses, interfaces
 
@@ -7,67 +8,63 @@ from book.application import dataclasses, interfaces
 @pytest.fixture(scope='function')
 def book():
     return dataclasses.Book(
-
         isbn13=9781491954461,
-        tag="mongo",
-        title="MongoDB: The Definitive Guide, 3rd Edition",
-        subtitle="Powerful and Scalable Data Storage",
-        authors="Shannon Bradshaw, Kristina Chodorow",
+        tag='mongo',
+        title='MongoDB: The Definitive Guide, 3rd Edition',
+        subtitle='Powerful and Scalable Data Storage',
+        authors='Shannon Bradshaw, Kristina Chodorow',
         pages=514,
         price=29.0,
         publisher="O'Reilly Media",
-        desc="Manage your data with a system",
+        desc='Manage your data with a system',
         year=2019,
         booking_time=None,
         rating=5,
         isbn10='12345678x',
         language='English',
         timestamp=datetime(2022, 4, 15, 20, 20, 20),
-
     )
 
 
 @pytest.fixture(scope='function')
 def book2():
     return dataclasses.Book(
-
         isbn13=9781491954462,
-        tag="mongo",
-        title="wer",
-        subtitle="Powerful and Scalable Data Storage",
-        authors="Shannon Bradshaw, Kristina Chodorow",
+        tag='mongo',
+        title='wer',
+        subtitle='Powerful and Scalable Data Storage',
+        authors='Shannon Bradshaw, Kristina Chodorow',
         pages=514,
         price=29.0,
         publisher="O'Reilly Media",
-        desc="Manage your data with a system",
+        desc='Manage your data with a system',
         year=2020,
         booking_time=None,
         rating=5,
         isbn10='12345678x',
         language='English',
-        timestamp=datetime(2022, 4, 15, 20, 20, 20)
+        timestamp=datetime(2022, 4, 15, 20, 20, 20),
     )
 
 
 @pytest.fixture(scope='function')
 def book3():
     return dataclasses.Book(
-
         isbn13=9781491954463,
-        tag="mongo",
-        title="ewq",
-        subtitle="Powerful and Scalable Data Storage",
-        authors="Shannon Bradshaw, Kristina Chodorow",
+        tag='mongo',
+        title='ewq',
+        subtitle='Powerful and Scalable Data Storage',
+        authors='Shannon Bradshaw, Kristina Chodorow',
         pages=514,
         price=29.0,
         publisher="O'Reilly Media",
-        desc="Manage your data with a system",
+        desc='Manage your data with a system',
         year=2021,
         booking_time=None,
         rating=5,
         isbn10='12345678x',
         language='English',
-        timestamp=datetime(2022, 4, 15, 20, 20, 20)
+        timestamp=datetime(2022, 4, 15, 20, 20, 20),
     )
 
 
@@ -75,14 +72,14 @@ def book3():
 def wrong_time_bought():
     return dataclasses.Book(
         isbn13=9781491954463,
-        tag="mongo",
-        title="ewq",
-        subtitle="Powerful and Scalable Data Storage",
-        authors="Shannon Bradshaw, Kristina Chodorow",
+        tag='mongo',
+        title='ewq',
+        subtitle='Powerful and Scalable Data Storage',
+        authors='Shannon Bradshaw, Kristina Chodorow',
         pages=514,
         price=29.0,
         publisher="O'Reilly Media",
-        desc="Manage your data with a system",
+        desc='Manage your data with a system',
         year=2021,
         booking_time=datetime(2024, 4, 15, 20, 20, 20),
         rating=5,
@@ -93,19 +90,18 @@ def wrong_time_bought():
     )
 
 
-
 @pytest.fixture(scope='function')
 def book_bought():
     return dataclasses.Book(
         isbn13=9781491954463,
-        tag="mongo",
-        title="ewq",
-        subtitle="Powerful and Scalable Data Storage",
-        authors="Shannon Bradshaw, Kristina Chodorow",
+        tag='mongo',
+        title='ewq',
+        subtitle='Powerful and Scalable Data Storage',
+        authors='Shannon Bradshaw, Kristina Chodorow',
         pages=514,
         price=29.0,
         publisher="O'Reilly Media",
-        desc="Manage your data with a system",
+        desc='Manage your data with a system',
         year=2021,
         booking_time=None,
         rating=5,

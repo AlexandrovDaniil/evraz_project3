@@ -4,6 +4,7 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
+
     @property
     def DB_URL(self):
         PG_USER = os.getenv('POSTGRES_USER', 'suuser')

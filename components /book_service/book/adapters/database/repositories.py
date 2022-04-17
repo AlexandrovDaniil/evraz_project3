@@ -5,7 +5,7 @@ from book.application import interfaces
 from book.application.dataclasses import Book, BookHistory
 from classic.components import component
 from classic.sql_storage import BaseRepository
-from sqlalchemy import or_, and_, desc, asc
+from sqlalchemy import and_, asc, desc, or_
 
 
 @component
@@ -16,7 +16,8 @@ class BooksRepo(BaseRepository, interfaces.BooksRepo):
         return query.first()
 
     def add_instance(self, book: Book):
-        if not self.session.query(Book).filter(Book.isbn13 == book.isbn13).one_or_none():
+        if not self.session.query(Book).filter(Book.isbn13 == book.isbn13
+                                               ).one_or_none():
             self.session.add(book)
             self.session.flush()
 
@@ -24,12 +25,18 @@ class BooksRepo(BaseRepository, interfaces.BooksRepo):
         query = self.session.query(Book).filter(Book.bought == False)
         return query.all()
 
-    def update_booking_time(self, book_id: int, booking_time: Optional[datetime]):
-        self.session.query(Book).filter(Book.isbn13 == book_id).update({Book.booking_time: booking_time})
+    def update_booking_time(
+        self, book_id: int, booking_time: Optional[datetime]
+    ):
+        self.session.query(Book).filter(Book.isbn13 == book_id).update(
+            {Book.booking_time: booking_time}
+        )
         self.session.flush()
 
     def get_history(self, user_id: int) -> List[BookHistory]:
-        query = self.session.query(BookHistory).filter(BookHistory.user_id == user_id)
+        query = self.session.query(BookHistory).filter(
+            BookHistory.user_id == user_id
+        )
         return query.all()
 
     def get_last_history_row(self, user_id: int) -> BookHistory:
@@ -38,7 +45,8 @@ class BooksRepo(BaseRepository, interfaces.BooksRepo):
         return query
 
     def buy_book(self, book_id: int):
-        self.session.query(Book).filter(Book.isbn13 == book_id).update({Book.bought: True})
+        self.session.query(Book).filter(Book.isbn13 == book_id
+                                        ).update({Book.bought: True})
         self.session.flush()
 
     def add_books_history_row(self, history_row: BookHistory):
@@ -68,9 +76,13 @@ class BooksRepo(BaseRepository, interfaces.BooksRepo):
             keyword = filter_data['keyword']
             if isinstance(filter_data['keyword'], list):
                 keyword = ','.join(keyword)
-            query = query.filter(or_(Book.title.ilike(f'%{keyword}%'),
-                                     Book.desc.ilike(f'%{keyword}%'),
-                                     Book.subtitle.ilike(f'%{keyword}%')))
+            query = query.filter(
+                or_(
+                    Book.title.ilike(f'%{keyword}%'),
+                    Book.desc.ilike(f'%{keyword}%'),
+                    Book.subtitle.ilike(f'%{keyword}%')
+                )
+            )
         return query
 
     @staticmethod

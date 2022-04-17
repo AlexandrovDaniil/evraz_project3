@@ -1,10 +1,9 @@
 import pytest
 from attr import asdict
-
+from sqlalchemy.orm import registry
 from user.adapters.database import tables
 from user.adapters.database.repositories import UsersRepo
 from user.application import dataclasses
-from sqlalchemy.orm import registry
 
 
 @pytest.fixture(scope='function')
@@ -53,10 +52,7 @@ def test__get_by_id(repo, fill_db):
 
 def test__add_instance(repo, fill_db):
     user = dataclasses.User(
-        id=3,
-        login='test_login1',
-        password='test_pass1',
-        name='Vasya'
+        id=3, login='test_login1', password='test_pass1', name='Vasya'
     )
     result = repo.add_instance(user)
     assert asdict(result) == user_data_new

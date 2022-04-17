@@ -8,10 +8,7 @@ from user.application import dataclasses, interfaces
 @pytest.fixture(scope='function')
 def user():
     return dataclasses.User(
-        name='user_name_1',
-        id=1,
-        login='test',
-        password='test'
+        name='user_name_1', id=1, login='test', password='test'
     )
 
 
@@ -23,6 +20,3 @@ def user_repo(user):
     user_repo.get_all = Mock(return_value=user)
     user_repo.get_by_login = Mock(return_value=user)
     return user_repo
-
-
-

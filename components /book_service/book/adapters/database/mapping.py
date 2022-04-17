@@ -8,4 +8,3 @@ mapper = registry()
 mapper.map_imperatively(dataclasses.Book, tables.BOOK)
 
 mapper.map_imperatively(dataclasses.BookHistory, tables.BOOK_HISTORY)
-

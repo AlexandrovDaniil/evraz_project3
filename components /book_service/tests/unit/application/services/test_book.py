@@ -1,10 +1,16 @@
 from datetime import datetime
-from unittest.mock import Mock
+
 import pytest
 from attr import asdict
+from book.application.errors import (
+    NoBook,
+    NotAvailable,
+    UserAlreadyHasBook,
+    UserHasNotBook,
+    WrongOper,
+    WrongUser,
+)
 from book.application.services import Books
-from book.application.errors import NotAvailable, NoBook, UserAlreadyHasBook, UserHasNotBook, WrongUser, WrongOper, \
-    AnyNewBook
 from pydantic import ValidationError
 
 
@@ -14,63 +20,59 @@ def service_book(book_repo):
 
 
 data_book = {
-    "isbn13": 9781491954461,
-    "tag": "mongo",
-    "title": "MongoDB: The Definitive Guide, 3rd Edition",
-    "subtitle": "Powerful and Scalable Data Storage",
-    "authors": "Shannon Bradshaw, Kristina Chodorow",
-    "pages": 514,
-    "price": 29.0,
-    "publisher": "O'Reilly Media",
-    "desc": "Manage your data with a system",
-    "year": 2019,
-    "booking_time": None,
-    "rating": 5,
-    "isbn10": '12345678x',
+    'isbn13': 9781491954461,
+    'tag': 'mongo',
+    'title': 'MongoDB: The Definitive Guide, 3rd Edition',
+    'subtitle': 'Powerful and Scalable Data Storage',
+    'authors': 'Shannon Bradshaw, Kristina Chodorow',
+    'pages': 514,
+    'price': 29.0,
+    'publisher': "O'Reilly Media",
+    'desc': 'Manage your data with a system',
+    'year': 2019,
+    'booking_time': None,
+    'rating': 5,
+    'isbn10': '12345678x',
     'language': 'English',
-    "timestamp": datetime(2022, 4, 15, 20, 20, 20),
+    'timestamp': datetime(2022, 4, 15, 20, 20, 20),
     'bought': False,
-
 }
 
 data_book2 = {
-    "isbn13": 9781491954462,
-    "tag": "mongo",
-    "title": "wer",
-    "subtitle": "Powerful and Scalable Data Storage",
-    "authors": "Shannon Bradshaw, Kristina Chodorow",
-    "pages": 514,
-    "price": 29.0,
-    "publisher": "O'Reilly Media",
-    "desc": "Manage your data with a system",
-    "year": 2020,
-    "booking_time": None,
-    "rating": 5,
-    "isbn10": '12345678x',
+    'isbn13': 9781491954462,
+    'tag': 'mongo',
+    'title': 'wer',
+    'subtitle': 'Powerful and Scalable Data Storage',
+    'authors': 'Shannon Bradshaw, Kristina Chodorow',
+    'pages': 514,
+    'price': 29.0,
+    'publisher': "O'Reilly Media",
+    'desc': 'Manage your data with a system',
+    'year': 2020,
+    'booking_time': None,
+    'rating': 5,
+    'isbn10': '12345678x',
     'language': 'English',
-    "timestamp": datetime(2022, 4, 15, 20, 20, 20),
+    'timestamp': datetime(2022, 4, 15, 20, 20, 20),
     'bought': False,
-
 }
-
 data_book3 = {
-    "isbn13": 9781491954463,
-    "tag": "mongo",
-    "title": "ewq",
-    "subtitle": "Powerful and Scalable Data Storage",
-    "authors": "Shannon Bradshaw, Kristina Chodorow",
-    "pages": 514,
-    "price": 29.0,
-    "publisher": "O'Reilly Media",
-    "desc": "Manage your data with a system",
-    "year": 2021,
-    "booking_time": datetime(2024, 4, 15, 20, 20, 20),
-    "rating": 5,
-    "isbn10": '12345678x',
+    'isbn13': 9781491954463,
+    'tag': 'mongo',
+    'title': 'ewq',
+    'subtitle': 'Powerful and Scalable Data Storage',
+    'authors': 'Shannon Bradshaw, Kristina Chodorow',
+    'pages': 514,
+    'price': 29.0,
+    'publisher': "O'Reilly Media",
+    'desc': 'Manage your data with a system',
+    'year': 2021,
+    'booking_time': datetime(2024, 4, 15, 20, 20, 20),
+    'rating': 5,
+    'isbn10': '12345678x',
     'language': 'English',
-    "timestamp": datetime(2022, 4, 15, 20, 20, 20),
+    'timestamp': datetime(2022, 4, 15, 20, 20, 20),
     'bought': False,
-
 }
 
 data_book_history = {
@@ -93,7 +95,9 @@ def test_parse_message(service_book):
 
 def test_send_to_user_wrong_args(service_book):
     with pytest.raises(ValidationError):
-        service_book._send_top_to_user(timestamp=datetime(2022, 4, 15, 20, 20, 20))
+        service_book._send_top_to_user(
+            timestamp=datetime(2022, 4, 15, 20, 20, 20)
+        )
 
 
 def test_add_book(service_book):

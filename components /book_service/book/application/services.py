@@ -1,14 +1,13 @@
 import threading
 from datetime import datetime, timedelta
-from typing import Optional, List, Union
+from typing import List, Optional, Union
 
 import requests
-
 from classic.app import DTO, validate_with_dto
 from classic.aspects import PointCut
 from classic.components import component
-from pydantic import validate_arguments
 from classic.messaging import Message, Publisher
+from pydantic import validate_arguments
 
 from . import errors, interfaces
 from .dataclasses import Book, BookHistory
@@ -53,7 +52,8 @@ class Books:
         history_row = self.book_repo.get_last_history_row(user_id)
         if history_row:
             last_book = self.book_repo.get_by_id(history_row.book_id)
-            if last_book.booking_time is None or last_book.booking_time < datetime.utcnow() or last_book.bought:
+            if last_book.booking_time is None or last_book.booking_time < datetime.utcnow(
+            ) or last_book.bought:
                 return False
             return True
         return False
@@ -73,13 +73,17 @@ class Books:
             top_books = self.book_repo.get_top_3(tag, timestamp)
             if top_books:
                 for book in top_books:
-                    prep_d = {'title': book.title,
-                              'rating': book.rating,
-                              'year': book.year}
+                    prep_d = {
+                        'title': book.title,
+                        'rating': book.rating,
+                        'year': book.year
+                    }
                     res.append(prep_d)
                 top_books_by_tag[tag] = res
         if top_books_by_tag:
-            self.publisher.publish(Message('Top3ApiExchange', {'data': top_books_by_tag}))
+            self.publisher.publish(
+                Message('Top3ApiExchange', {'data': top_books_by_tag})
+            )
 
     @join_point
     @validate_arguments
@@ -95,12 +99,20 @@ class Books:
         threads = []
         timestamp = datetime.utcnow()
         for tag in tags:
-            r = requests.get(f'https://api.itbook.store/1.0/search/{tag}').json()
-            page_count = (int(r['total']) // 10) + (1 if int(r['total']) % 10 != 0 else 0)
+            r = requests.get(f'https://api.itbook.store/1.0/search/{tag}'
+                             ).json()
+            page_count = (int(r['total']) //
+                          10) + (1 if int(r['total']) % 10 != 0 else 0)
             page_count = page_count if page_count < 5 else 5
             for i in range(1, page_count + 1):
-                t = threading.Thread(target=self.get_books_from_page,
-                                     kwargs={'tag': tag, 'page': i, 'timestamp': timestamp})
+                t = threading.Thread(
+                    target=self.get_books_from_page,
+                    kwargs={
+                        'tag': tag,
+                        'page': i,
+                        'timestamp': timestamp
+                    }
+                )
                 t.start()
                 threads.append(t)
             for thread in threads:
@@ -111,11 +123,15 @@ class Books:
     @validate_arguments
     def get_books_from_page(self, tag: str, page: int, timestamp: datetime):
         books_ids = []
-        book_page = requests.get(f'https://api.itbook.store/1.0/search/{tag}/{page}').json()
+        book_page = requests.get(
+            f'https://api.itbook.store/1.0/search/{tag}/{page}'
+        ).json()
         for book in book_page['books']:
             books_ids.append(book['isbn13'])
         for book_id in books_ids:
-            book = requests.get(f'https://api.itbook.store/1.0/books/{int(book_id)}').json()
+            book = requests.get(
+                f'https://api.itbook.store/1.0/books/{int(book_id)}'
+            ).json()
             book['price'] = float(book['price'][1:])
             book['timestamp'] = timestamp
             book['tag'] = tag
@@ -170,7 +186,8 @@ class Books:
         if not book:
             raise errors.NoBook(id=book_id)
         if not self._is_user_has_book(user_id):
-            if (book.booking_time is None or book.booking_time < datetime.utcnow()) and book.bought is False:
+            if (book.booking_time is None or book.booking_time <
+                    datetime.utcnow()) and book.bought is False:
                 time_of_booking = datetime.utcnow() + timedelta(minutes=period)
                 book_history = BookHistoryInfo(
                     book_id=book_id,
@@ -204,7 +221,8 @@ class Books:
     def get_active_book(self, user_id: int) -> Union[Book]:
         last_book = self.book_repo.get_last_history_row(user_id)
         book = self.book_repo.get_by_id(last_book.book_id)
-        if book.booking_time is None or book.booking_time < datetime.utcnow() or book.bought:
+        if book.booking_time is None or book.booking_time < datetime.utcnow(
+        ) or book.bought:
             raise errors.UserHasNotBook()
         else:
             return book

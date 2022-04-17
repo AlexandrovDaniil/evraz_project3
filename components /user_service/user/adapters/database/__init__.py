@@ -1,4 +1,4 @@
 from . import repositories
 from .mapping import mapper
 from .settings import Settings
-from .tables import metadata, USER
+from .tables import USER, metadata

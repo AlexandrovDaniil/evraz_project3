@@ -1,13 +1,14 @@
 from typing import List, Optional
 
-from user.application import interfaces
-from user.application.dataclasses import User
 from classic.components import component
 from classic.sql_storage import BaseRepository
+from user.application import interfaces
+from user.application.dataclasses import User
 
 
 @component
 class UsersRepo(BaseRepository, interfaces.UsersRepo):
+
     def get_by_id(self, user_id: int) -> Optional[User]:
         query = self.session.query(User).filter(User.id == user_id)
         return query.first()

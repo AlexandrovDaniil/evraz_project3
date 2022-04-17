@@ -1,14 +1,14 @@
 import pytest
-from sqlalchemy import create_engine
-
 from classic.sql_storage import TransactionContext
-
+from sqlalchemy import create_engine
 from user.adapters.database.tables import metadata
 
 
 @pytest.fixture(scope='session')
 def engine():
-    engine = create_engine('postgresql://postgres:password@localhost:5433/3rd_proj_integration_tests')
+    engine = create_engine(
+        'postgresql://postgres:password@localhost:5433/3rd_proj_integration_tests'
+    )
 
     for key, value in metadata.tables.items():
         value.schema = None

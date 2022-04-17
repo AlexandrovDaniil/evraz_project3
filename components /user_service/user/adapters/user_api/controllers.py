@@ -1,7 +1,7 @@
 from classic.components import component
 from classic.http_auth import authenticate, authenticator_needed
-
 from user.application import services
+
 from .auth import generate_token
 from .join_points import join_point
 
@@ -38,7 +38,10 @@ class Users:
     @authenticate
     def on_get_show_all(self, request, response):
         users = self.users.get_all()
-        response.media = [{'id': user.id,
-                           'name': user.name,
-                           'login': user.login}
-                          for user in users]
+        response.media = [
+            {
+                'id': user.id,
+                'name': user.name,
+                'login': user.login
+            } for user in users
+        ]

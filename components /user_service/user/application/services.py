@@ -1,10 +1,9 @@
-from typing import Optional, List
+from typing import List, Optional
 
 from classic.app import DTO, validate_with_dto
 from classic.aspects import PointCut
 from classic.components import component
 from pydantic import validate_arguments
-from classic.messaging import Message, Publisher
 
 from . import errors, interfaces
 from .dataclasses import User
@@ -23,7 +22,6 @@ class UserInfo(DTO):
 @component
 class Users:
     user_repo: interfaces.UsersRepo
-    publisher: Optional[Publisher] = None
 
     @join_point
     @validate_arguments

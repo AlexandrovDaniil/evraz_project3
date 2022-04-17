@@ -1,9 +1,7 @@
-import logging
-from typing import Optional, List
+from typing import List, Optional
 
 from classic.components import component
-
-from user.application import interfaces, dataclasses
+from user.application import dataclasses, interfaces
 
 
 @component
@@ -17,4 +15,6 @@ class MailSender(interfaces.MailSender):
                 for tag in data:
                     print(f'For tag {tag}:')
                     for book in data[tag]:
-                        print(f'\t{book["title"]}, rating: {book["rating"]}, publish year: {book["year"]}')
+                        print(
+                            f'\t{book["title"]}, rating: {book["rating"]}, publish year: {book["year"]}'
+                        )

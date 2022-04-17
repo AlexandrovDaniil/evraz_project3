@@ -2,25 +2,23 @@ from datetime import datetime
 from unittest.mock import Mock
 
 import pytest
-from falcon import testing
-
 from book.adapters import book_api
-from book.application import services
-from book.application import dataclasses
+from book.application import dataclasses, services
+from falcon import testing
 
 
 @pytest.fixture(scope='function')
 def book():
     return dataclasses.Book(
         isbn13=9781491954461,
-        tag="mongo",
-        title="MongoDB: The Definitive Guide, 3rd Edition",
-        subtitle="Powerful and Scalable Data Storage",
-        authors="Shannon Bradshaw, Kristina Chodorow",
+        tag='mongo',
+        title='MongoDB: The Definitive Guide, 3rd Edition',
+        subtitle='Powerful and Scalable Data Storage',
+        authors='Shannon Bradshaw, Kristina Chodorow',
         pages=514,
         price=29.0,
         publisher="O'Reilly Media",
-        desc="Manage your data with a system",
+        desc='Manage your data with a system',
         year=2019,
         booking_time=None,
         rating=5,
@@ -55,13 +53,7 @@ def books_service(book, book_history):
 
 
 @pytest.fixture(scope='function')
-def client(
-        books_service
-
-):
-    app = book_api.create_app(
-        is_dev_mode=True,
-        books=books_service
-    )
+def client(books_service):
+    app = book_api.create_app(is_dev_mode=True, books=books_service)
 
     return testing.TestClient(app)

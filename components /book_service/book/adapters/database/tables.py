@@ -1,4 +1,14 @@
-from sqlalchemy import Column, Integer, MetaData, String, Table, BigInteger, Float, Boolean, DateTime, ForeignKey
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    Integer,
+    MetaData,
+    String,
+    Table,
+)
 
 naming_convention = {
     'ix': 'ix_%(column_0_label)s',

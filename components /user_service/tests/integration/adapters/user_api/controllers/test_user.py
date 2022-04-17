@@ -25,7 +25,9 @@ def test__on_post_add_user(client, users_service):
     expected = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImxvZ2luIjoidGVzdF9sb2dpbjEiLCJuYW1lIj' \
                'oiVmFzeWEiLCJncm91cCI6IlVzZXIifQ.YykXhJt6OHOUVPNBq08H6wx9sSHlYtdzptp76nGLMu4'
 
-    result = client.simulate_post('/api/users/add_user', body=json.dumps(user_data))
+    result = client.simulate_post(
+        '/api/users/add_user', body=json.dumps(user_data)
+    )
 
     assert result.status_code == 200
     assert result.json == expected
@@ -39,16 +41,16 @@ def test__on_post_user_login(client, users_service):
     expected = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImxvZ2luIjoidGVzdF9sb2dpbjEiLCJuYW1lIj' \
                'oiVmFzeWEiLCJncm91cCI6IlVzZXIifQ.YykXhJt6OHOUVPNBq08H6wx9sSHlYtdzptp76nGLMu4'
 
-    result = client.simulate_post('/api/users/user_login', body=json.dumps(user_data))
+    result = client.simulate_post(
+        '/api/users/user_login', body=json.dumps(user_data)
+    )
 
     assert result.status_code == 200
     assert result.json == expected
 
 
 def test__on_get_show_all(client, users_service):
-    expected = [{'id': 1,
-                 'login': 'test_login1',
-                 'name': 'Vasya'}]
+    expected = [{'id': 1, 'login': 'test_login1', 'name': 'Vasya'}]
     header = {
         'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImxvZ2luIjoidGVzdF9sb2dpbjEiLCJuYW1lIj' \
                          'oiVmFzeWEiLCJncm91cCI6IlVzZXIifQ.YykXhJt6OHOUVPNBq08H6wx9sSHlYtdzptp76nGLMu4'}

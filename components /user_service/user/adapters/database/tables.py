@@ -11,10 +11,8 @@ naming_convention = {
 metadata = MetaData(naming_convention=naming_convention)
 
 USER = Table(
-    'user',
-    metadata,
+    'user', metadata,
     Column('id', Integer, primary_key=True, autoincrement=True),
-    Column('name', String(50)),
-    Column('login', String(50)),
+    Column('name', String(50)), Column('login', String(50)),
     Column('password', String(50))
 )

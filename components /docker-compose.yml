@@ -52,6 +52,7 @@ services:
       - RABBITMQ_USER=user
       - RABBITMQ_PASSWORD=password
       - RABBITMQ_HOST=rabbitmq
+      - SECRET_KEY_JWT=my_secret_jwt
     depends_on:
       - postgresdb_users
       - rabbitmq
@@ -94,6 +95,7 @@ services:
       - RABBITMQ_USER=user
       - RABBITMQ_PASSWORD=password
       - RABBITMQ_HOST=rabbitmq
+      - SECRET_KEY_JWT=my_secret_jwt
     depends_on:
       - postgresdb_books
       - rabbitmq

@@ -1,7 +1,6 @@
 from datetime import datetime
 
 import pytest
-
 from book.adapters.database import tables
 from book.adapters.database.repositories import BooksRepo
 from book.application import dataclasses
@@ -12,42 +11,40 @@ from sqlalchemy.orm import registry
 def fill_db(session):
     books_data = [
         {
-            "isbn13": 9781491954461,
-            "tag": "mongo",
-            "title": "MongoDB: The Definitive Guide, 3rd Edition",
-            "subtitle": "Powerful and Scalable Data Storage",
-            "authors": "Shannon Bradshaw, Kristina Chodorow",
-            "pages": 514,
-            "price": 29.0,
-            "publisher": "O'Reilly Media",
-            "desc": "Manage your data with a system",
-            "year": 2019,
-            "booking_time": None,
-            "rating": 5,
-            "isbn10": '12345678x',
+            'isbn13': 9781491954461,
+            'tag': 'mongo',
+            'title': 'MongoDB: The Definitive Guide, 3rd Edition',
+            'subtitle': 'Powerful and Scalable Data Storage',
+            'authors': 'Shannon Bradshaw, Kristina Chodorow',
+            'pages': 514,
+            'price': 29.0,
+            'publisher': "O'Reilly Media",
+            'desc': 'Manage your data with a system',
+            'year': 2019,
+            'booking_time': None,
+            'rating': 5,
+            'isbn10': '12345678x',
             'language': 'English',
-            "timestamp": datetime(2022, 4, 15, 20, 20, 20),
+            'timestamp': datetime(2022, 4, 15, 20, 20, 20),
             'bought': False,
-
         },
         {
-            "isbn13": 9781491954462,
-            "tag": "mongo",
-            "title": "MongoDB: The Definitive Guide, 3rd Edition",
-            "subtitle": "Powerful and Scalable Data Storage",
-            "authors": "Shannon Bradshaw, Kristina Chodorow",
-            "pages": 514,
-            "price": 29.0,
-            "publisher": "O'Reilly Media",
-            "desc": "Manage your data with a system",
-            "year": 2020,
-            "booking_time": None,
-            "rating": 5,
-            "isbn10": '12345678x',
+            'isbn13': 9781491954462,
+            'tag': 'mongo',
+            'title': 'MongoDB: The Definitive Guide, 3rd Edition',
+            'subtitle': 'Powerful and Scalable Data Storage',
+            'authors': 'Shannon Bradshaw, Kristina Chodorow',
+            'pages': 514,
+            'price': 29.0,
+            'publisher': "O'Reilly Media",
+            'desc': 'Manage your data with a system',
+            'year': 2020,
+            'booking_time': None,
+            'rating': 5,
+            'isbn10': '12345678x',
             'language': 'English',
-            "timestamp": datetime(2022, 4, 15, 20, 20, 20),
+            'timestamp': datetime(2022, 4, 15, 20, 20, 20),
             'bought': False,
-
         },
     ]
     books_history_data = [
@@ -56,8 +53,7 @@ def fill_db(session):
             'user_id': 1,
             'booking_time': datetime(2022, 4, 15, 20, 20, 20),
             'id': 1
-        },
-        {
+        }, {
             'book_id': 9781491954464,
             'user_id': 2,
             'booking_time': datetime(2021, 4, 15, 20, 20, 20),
@@ -81,23 +77,22 @@ def repo(transaction_context):
 
 
 book_data_new = {
-    "isbn13": 9781491954463,
-    "tag": "mongo",
-    "title": "MongoDB: The Definitive Guide, 3rd Edition",
-    "subtitle": "Powerful and Scalable Data Storage",
-    "authors": "Shannon Bradshaw, Kristina Chodorow",
-    "pages": 514,
-    "price": 29.0,
-    "publisher": "O'Reilly Media",
-    "desc": "Manage your data with a system",
-    "year": 2020,
-    "booking_time": None,
-    "rating": 5,
-    "isbn10": '12345678x',
+    'isbn13': 9781491954463,
+    'tag': 'mongo',
+    'title': 'MongoDB: The Definitive Guide, 3rd Edition',
+    'subtitle': 'Powerful and Scalable Data Storage',
+    'authors': 'Shannon Bradshaw, Kristina Chodorow',
+    'pages': 514,
+    'price': 29.0,
+    'publisher': "O'Reilly Media",
+    'desc': 'Manage your data with a system',
+    'year': 2019,
+    'booking_time': None,
+    'rating': 5,
+    'isbn10': '12345678x',
     'language': 'English',
-    "timestamp": datetime(2022, 4, 15, 20, 20, 20),
+    'timestamp': datetime(2022, 4, 15, 20, 20, 20),
     'bought': False,
-
 }
 
 book_history_data_new = {
@@ -114,9 +109,7 @@ def test__get_by_id(repo, fill_db):
 
 
 def test__add_instance(repo, fill_db):
-    book = dataclasses.Book(
-        **book_data_new
-    )
+    book = dataclasses.Book(**book_data_new)
     repo.add_instance(book)
     result = repo.get_by_id(9781491954463)
     assert result.isbn13 == 9781491954463
@@ -150,16 +143,16 @@ def test__buy_book(repo, fill_db):
 
 
 def test__add_books_history_row(repo, fill_db):
-    book_history_row = dataclasses.BookHistory(
-        **book_history_data_new
-    )
+    book_history_row = dataclasses.BookHistory(**book_history_data_new)
     repo.add_books_history_row(book_history_row)
     result = repo.get_last_history_row(user_id=1)
     assert result.book_id == 9781491954465
 
 
 def test__get_top_3(repo, fill_db):
-    result = repo.get_top_3(tag='mongo', timestamp=datetime(2022, 4, 15, 20, 20, 20))
+    result = repo.get_top_3(
+        tag='mongo', timestamp=datetime(2022, 4, 15, 20, 20, 20)
+    )
     assert result[0].isbn13 == 9781491954461
 
 

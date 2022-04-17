@@ -1,7 +1,8 @@
 import pytest
-from evraz.classic.sql_storage import TransactionContext
 from sqlalchemy import create_engine
 from user.adapters.database.tables import metadata
+
+from evraz.classic.sql_storage import TransactionContext
 
 
 @pytest.fixture(scope='session')

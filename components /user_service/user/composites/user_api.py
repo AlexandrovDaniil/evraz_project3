@@ -1,9 +1,10 @@
-from evraz.classic.sql_storage import TransactionContext
 from kombu import Connection
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from user.adapters import database, mail_sending, message_bus, user_api
 from user.application import services
+
+from evraz.classic.sql_storage import TransactionContext
 
 
 class Settings:

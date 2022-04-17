@@ -1,9 +1,10 @@
 from typing import List, Optional
 
-from evraz.classic.components import component
-from evraz.classic.sql_storage import BaseRepository
 from user.application import interfaces
 from user.application.dataclasses import User
+
+from evraz.classic.components import component
+from evraz.classic.sql_storage import BaseRepository
 
 
 @component

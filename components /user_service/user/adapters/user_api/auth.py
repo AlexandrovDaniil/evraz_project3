@@ -1,6 +1,7 @@
 import os
 
 import jwt
+
 from evraz.classic.http_auth import Group, Permission, strategies
 
 

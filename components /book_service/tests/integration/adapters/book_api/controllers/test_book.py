@@ -30,19 +30,20 @@ def test__on_get_show_info(client, books_service):
 
 
 def test__on_get_show_all(client, books_service):
-    expected = [{
-        'book id': 9781491954461,
-        'tag': 'mongo',
-        'title': 'MongoDB: The Definitive Guide, 3rd Edition',
-        'subtitle': 'Powerful and Scalable Data Storage',
-        'authors': 'Shannon Bradshaw, Kristina Chodorow',
-        'pages': 514,
-        'price': 29.0,
-        'publisher': "O'Reilly Media",
-        'description': 'Manage your data with a system',
-        'published year': 2019,
-        'booking time': None,
-    }
+    expected = [
+        {
+            'book id': 9781491954461,
+            'tag': 'mongo',
+            'title': 'MongoDB: The Definitive Guide, 3rd Edition',
+            'subtitle': 'Powerful and Scalable Data Storage',
+            'authors': 'Shannon Bradshaw, Kristina Chodorow',
+            'pages': 514,
+            'price': 29.0,
+            'publisher': "O'Reilly Media",
+            'description': 'Manage your data with a system',
+            'published year': 2019,
+            'booking time': None,
+        }
     ]
     header = {
         'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImxvZ2luIjoidGVzdF9sb2dpbjEiLCJuYW1lIj' \
@@ -54,19 +55,20 @@ def test__on_get_show_all(client, books_service):
 
 
 def test__on_get_filter(client, books_service):
-    expected = [{
-        'book id': 9781491954461,
-        'tag': 'mongo',
-        'title': 'MongoDB: The Definitive Guide, 3rd Edition',
-        'subtitle': 'Powerful and Scalable Data Storage',
-        'authors': 'Shannon Bradshaw, Kristina Chodorow',
-        'pages': 514,
-        'price': 29.0,
-        'publisher': "O'Reilly Media",
-        'description': 'Manage your data with a system',
-        'published year': 2019,
-        'booking time': None,
-    }
+    expected = [
+        {
+            'book id': 9781491954461,
+            'tag': 'mongo',
+            'title': 'MongoDB: The Definitive Guide, 3rd Edition',
+            'subtitle': 'Powerful and Scalable Data Storage',
+            'authors': 'Shannon Bradshaw, Kristina Chodorow',
+            'pages': 514,
+            'price': 29.0,
+            'publisher': "O'Reilly Media",
+            'description': 'Manage your data with a system',
+            'published year': 2019,
+            'booking time': None,
+        }
     ]
     header = {
         'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImxvZ2luIjoidGVzdF9sb2dpbjEiLCJuYW1lIj' \

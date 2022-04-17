@@ -1,4 +1,4 @@
-from classic.app.errors import AppError
+from evraz.classic.app.errors import AppError
 
 
 class NoUser(AppError):

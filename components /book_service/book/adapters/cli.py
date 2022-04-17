@@ -1,5 +1,5 @@
 import click
-from classic.messaging import Message
+from evraz.classic.messaging import Message
 
 
 def create_cli(publisher, MessageBusCons):

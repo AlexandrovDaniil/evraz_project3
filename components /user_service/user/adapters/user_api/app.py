@@ -1,5 +1,5 @@
-from classic.http_api import App
-from classic.http_auth import Authenticator
+from evraz.classic.http_api import App
+from evraz.classic.http_auth import Authenticator
 from user.application import services
 
 from . import auth, controllers

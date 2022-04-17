@@ -3,8 +3,8 @@ from typing import List, Optional
 
 from book.application import interfaces
 from book.application.dataclasses import Book, BookHistory
-from classic.components import component
-from classic.sql_storage import BaseRepository
+from evraz.classic.components import component
+from evraz.classic.sql_storage import BaseRepository
 from sqlalchemy import and_, asc, desc, or_
 
 

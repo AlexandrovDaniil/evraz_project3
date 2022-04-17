@@ -12,7 +12,7 @@ COPY . .
 COPY ./dist .
 
 COPY . ./book
-#RUN pip install *.tar.gz
+RUN pip install *.tar.gz
 COPY . .
 
 COPY ./entrypoint_*.sh /usr/bin/

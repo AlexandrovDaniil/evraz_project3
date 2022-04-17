@@ -1,4 +1,4 @@
-from classic.sql_storage import TransactionContext
+from evraz.classic.sql_storage import TransactionContext
 from kombu import Connection
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker

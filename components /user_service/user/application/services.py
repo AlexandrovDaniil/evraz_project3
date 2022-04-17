@@ -1,8 +1,8 @@
 from typing import List, Optional
 
-from classic.app import DTO, validate_with_dto
-from classic.aspects import PointCut
-from classic.components import component
+from evraz.classic.app import DTO, validate_with_dto
+from evraz.classic.aspects import PointCut
+from evraz.classic.components import component
 from pydantic import validate_arguments
 
 from . import errors, interfaces

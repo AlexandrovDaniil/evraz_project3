@@ -1,6 +1,6 @@
 from book.application import services
-from classic.components import component
-from classic.http_auth import authenticate, authenticator_needed
+from evraz.classic.components import component
+from evraz.classic.http_auth import authenticate, authenticator_needed
 
 from .join_points import join_point
 

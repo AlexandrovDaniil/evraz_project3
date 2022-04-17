@@ -1,5 +1,5 @@
 import pytest
-from classic.sql_storage import TransactionContext
+from evraz.classic.sql_storage import TransactionContext
 from sqlalchemy import create_engine
 from user.adapters.database.tables import metadata
 

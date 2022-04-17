@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from classic.components import component
+from evraz.classic.components import component
 from user.application import dataclasses, interfaces
 
 

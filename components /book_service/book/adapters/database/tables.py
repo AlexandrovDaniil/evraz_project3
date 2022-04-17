@@ -30,8 +30,6 @@ BOOK = Table(
     Column('language', String(50)),
 )
 
-
-
 BOOK_HISTORY = Table(
     'book_history',
     metadata,

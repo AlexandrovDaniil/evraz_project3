@@ -23,3 +23,6 @@ def user_repo(user):
     user_repo.get_all = Mock(return_value=user)
     user_repo.get_by_login = Mock(return_value=user)
     return user_repo
+
+
+

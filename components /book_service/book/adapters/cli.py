@@ -10,7 +10,7 @@ def create_cli(publisher, MessageBusCons):
     @cli.command()
     @click.argument('tags', nargs=-1)
     def get_books(tags):
-        publisher.publish(Message('TestApiExchange', {'tags': tags}))
+        publisher.publish(Message('ApiExchange', {'tags': tags}))
 
     @cli.command()
     def consumer():

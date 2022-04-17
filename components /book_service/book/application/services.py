@@ -49,6 +49,7 @@ class Books:
     book_repo: interfaces.BooksRepo
     publisher: Optional[Publisher] = None
 
+    @validate_arguments
     def _is_user_has_book(self, user_id: int) -> bool:
         history_row = self.book_repo.get_last_history_row(user_id)
         if history_row:
@@ -58,6 +59,7 @@ class Books:
             return True
         return False
 
+    @validate_arguments
     def _is_book_exists(self, book_id) -> bool:
         book = self.book_repo.get_by_id(book_id)
         if book:
@@ -70,16 +72,16 @@ class Books:
         for tag in tags:
             res = []
             top_books = self.book_repo.get_top_3(tag, timestamp)
-            if not top_books:
-                raise errors.AnyNewBook()
-            for book in top_books:
-                prep_d = {'title': book.title,
-                          'rating': book.rating,
-                          'year': book.year}
-                res.append(prep_d)
-            top_books_by_tag[tag] = res
-
-        self.publisher.publish(Message('Top3ApiExchange', {'data': top_books_by_tag}))
+            if top_books:
+                # raise errors.AnyNewBook()
+                for book in top_books:
+                    prep_d = {'title': book.title,
+                              'rating': book.rating,
+                              'year': book.year}
+                    res.append(prep_d)
+                top_books_by_tag[tag] = res
+        if top_books_by_tag:
+            self.publisher.publish(Message('Top3ApiExchange', {'data': top_books_by_tag}))
 
     @join_point
     @validate_arguments

@@ -1,7 +1,6 @@
 import click
 
 
-
 def create_cli(MessageBus):
     @click.group()
     def cli():

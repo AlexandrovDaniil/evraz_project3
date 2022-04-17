@@ -17,3 +17,10 @@ class UsersRepo(ABC):
 
     @abstractmethod
     def get_by_login(self, login: str) -> Optional[User]: ...
+
+
+class MailSender(ABC):
+
+    @abstractmethod
+    def send(self, users: List[User], data: dict):
+        ...

@@ -8,13 +8,13 @@ from .scheme import broker_scheme
 
 
 def create_consumer(
-    connection: Connection, user: services.Users
+    connection: Connection, sender: services.MailSender
 ) -> KombuConsumer:
 
     consumer = KombuConsumer(connection=connection, scheme=broker_scheme)
 
     consumer.register_function(
-        user.send_message,
+        sender.send_message_to_users,
         'Top3ApiQueue',
     )
 

@@ -15,7 +15,7 @@ def create_consumer(
 
     consumer.register_function(
         book.parse_message,
-        'TestApiQueue',
+        'ApiQueue',
     )
 
     return consumer

@@ -6,7 +6,7 @@ class Permissions:
 
 
 class Groups:
-   USERS = Group('User', permissions=(Permissions.FULL_CONTROL,))
+    USERS = Group('User', permissions=(Permissions.FULL_CONTROL,))
 
 
 jwt_strategy = strategies.JWT(

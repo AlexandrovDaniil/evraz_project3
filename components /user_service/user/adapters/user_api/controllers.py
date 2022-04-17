@@ -1,5 +1,3 @@
-import jwt
-
 from classic.components import component
 from classic.http_auth import authenticate, authenticator_needed
 
@@ -44,4 +42,3 @@ class Users:
                            'name': user.name,
                            'login': user.login}
                           for user in users]
-

@@ -1,11 +1,11 @@
-from user.adapters import user_api, database, message_bus
+from user.adapters import user_api, database, message_bus, mail_sending
 from user.application import services
 from classic.sql_storage import TransactionContext
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from kombu import Connection
-from classic.messaging_kombu import KombuPublisher
+
 
 
 class Settings:
@@ -23,14 +23,22 @@ class DB:
     users_repo = database.repositories.UsersRepo(context=context)
 
 
+class MailSending:
+    sender = mail_sending.MailSender()
+
+
 class Application:
     is_dev_mode = Settings.user_api.IS_DEV_MODE
     users = services.Users(user_repo=DB.users_repo)
+    sender = services.MailSender(
+        user_repo=DB.users_repo,
+        mail_sender=MailSending.sender,
+    )
 
 
 class MessageBus:
     connection = Connection(Settings.message_bus.BROKER_URL)
-    consumer = message_bus.create_consumer(connection, Application.users)
+    consumer = message_bus.create_consumer(connection, Application.sender)
 
     @staticmethod
     def declare_scheme():

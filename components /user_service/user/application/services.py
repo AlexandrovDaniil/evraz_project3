@@ -58,13 +58,12 @@ class Users:
         users = self.user_repo.get_all()
         return users
 
-    def send_message(self, data: dict):
-        all_users = self.get_all()
-        if all_users:
-            for user in all_users:
-                print(f'Dear {user.name}, we have something to you!')
-                print(f'Here is our new books compilation:')
-                for tag in data:
-                    print(f'For tag {tag}:')
-                    for book in data[tag]:
-                        print(f'\t{book["title"]}, rating: {book["rating"]}, publish year: {book["year"]}')
+
+@component
+class MailSender:
+    user_repo: interfaces.UsersRepo
+    mail_sender: interfaces.MailSender
+
+    def send_message_to_users(self, data: dict):
+        users = self.user_repo.get_all()
+        self.mail_sender.send(users, data)

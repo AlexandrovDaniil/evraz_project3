@@ -4,7 +4,6 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app
-#ENV PATH=$PATH:/usr/bin
 COPY ./setup.cfg .
 COPY ./setup.py .
 RUN pip install --upgrade -e '.[dev]'

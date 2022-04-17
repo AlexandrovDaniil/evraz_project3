@@ -91,7 +91,7 @@ def test__on_get_show_history(client, books_service):
     expected = [{
         'book id': 9781491954463,
         'user id': 1,
-        'action': 'take book',
+        # 'action': 'take book',
         'booking time': datetime(2022, 4, 15, 20, 20, 20).strftime('%Y-%m-%d %H:%M:%S'),
         'id': 1
     }]

@@ -1,0 +1,39 @@
+@startuml
+
+header Финальный проект
+title Схема БД микросервиса книг
+
+hide circle
+skinparam linetype ortho
+
+
+entity book {
+  * **isbn13**  :  int
+  __
+    title  :  varchar
+    subtitle  :  varchar
+    authors  :  varchar
+    publisher  :  varchar
+    isbn10  :  varchar
+    tag  :  varchar
+    pages  :  int
+    year  :  int
+    rating  :  int
+    desc  :  varchar
+    price  :  float
+    bought  :  bool
+    booking_time  :  datetime
+    timestamp  :  datetime
+    language  :  varchar
+}
+
+
+entity book_history {
+  * **id**  :  int
+  __
+    book_id  :  varchar
+    user_id  :  varchar
+    booking_time  :  varchar
+}
+
+@enduml

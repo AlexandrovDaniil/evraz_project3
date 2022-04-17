@@ -9,7 +9,7 @@ def create_cli(publisher, MessageBusCons):
 
     @cli.command()
     @click.argument('tags', nargs=-1)
-    def get_books(tags):
+    def get_tags(tags):
         publisher.publish(Message('ApiExchange', {'tags': tags}))
 
     @cli.command()
@@ -18,6 +18,6 @@ def create_cli(publisher, MessageBusCons):
         MessageBusCons.consumer.run()
 
     return cli
-# book_service get-books azure
-# book_service get-books actionscript azure
-# book_service get-books mongo azure ios 1:08/0:10
+# book_service get-tags azure
+# book_service get-tags actionscript azure
+# book_service get-tags mongo azure ios 1:08/0:10

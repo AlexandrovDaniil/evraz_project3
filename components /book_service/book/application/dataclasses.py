@@ -28,6 +28,5 @@ class Book:
 class BookHistory:
     book_id: int
     user_id: int
-    action: str
     booking_time: datetime
     id: Optional[int] = None

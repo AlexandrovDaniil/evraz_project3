@@ -37,5 +37,4 @@ BOOK_HISTORY = Table(
     Column('book_id', BigInteger),
     Column('booking_time', DateTime),
     Column('user_id', Integer),
-    Column('action', String),
 )

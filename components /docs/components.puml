@@ -1,0 +1,74 @@
+@startuml
+
+header Финальный проект
+title Диаграмма компонентов
+
+rectangle "Interfaces books (Primary Adapters)" {
+  [Book API] as book_api
+  [Rabbitmq consumer] as rabbitmq_consumer
+}
+
+rectangle "Book microservices" {
+  [Book] as book
+  interface "Book repositories" as book_repositories
+  interface "Book publisher" as book_publisher
+}
+
+rectangle "Adapters books (Secondary Adapters)" {
+  [Database] as database
+  [Publisher] as publisher
+}
+
+rectangle "Proxy server" {
+  [Nginx] as nginx
+}
+
+() "AMQP" as amqp
+() "HTTP API" as http_api
+
+rabbitmq_consumer -u-( amqp
+nginx -u-( http_api
+book_api -u-( nginx
+book_api ..> book
+rabbitmq_consumer ..> book
+
+book --( book_repositories
+book --( book_publisher
+
+
+
+publisher -u- book_publisher
+database -u- book_repositories
+
+
+
+rectangle "Interfaces users (Primary Adapters)" {
+  [User API] as user_api
+  [Rabbitmq consumer] as rabbitmq_consumer1
+}
+
+rectangle "User microservices" {
+  [User] as user
+  interface "User repositories" as user_repositories
+  interface "User mail sender" as user_mailsender
+}
+
+rectangle "Adapters users (Secondary Adapters)" {
+  [Database] as database_user
+  [Mailsender] as mailsender_user
+}
+
+() "AMQP" as amqp
+() "HTTP API" as http_api
+
+rabbitmq_consumer1 -u-( amqp
+user_api -u-( nginx
+user_api ..> user
+rabbitmq_consumer1 ..> user
+
+user --( user_repositories
+user --( user_mailsender
+
+mailsender_user -u- user_mailsender
+database_user -u- user_repositories
+@enduml

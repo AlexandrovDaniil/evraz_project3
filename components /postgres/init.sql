@@ -1,8 +1,0 @@
-CREATE user suuser WITH PASSWORD 'suuser';
-
-CREATE DATABASE usersdb;
-CREATE DATABASE booksdb;
-
-
-GRANT ALL PRIVILEGES ON DATABASE usersdb TO suuser;
-GRANT ALL PRIVILEGES ON DATABASE booksdb TO suuser;

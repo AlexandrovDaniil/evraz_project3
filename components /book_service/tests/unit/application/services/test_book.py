@@ -76,7 +76,6 @@ data_book3 = {
 data_book_history = {
     'book_id': 9781491954463,
     'user_id': 1,
-    'action': 'take book',
     'booking_time': datetime(2022, 4, 15, 20, 20, 20),
     'id': 1
 }
@@ -92,15 +91,19 @@ def test_parse_message(service_book):
         service_book.parse_message()
 
 
-def test_send_to_user_any_books(service_book):
-    service_book.book_repo.get_top_3.return_value = []
-    with pytest.raises(AnyNewBook):
-        service_book._send_top_to_user(tags=('mongo',), timestamp=datetime(2022, 4, 15, 20, 20, 20))
-
-
 def test_send_to_user_wrong_args(service_book):
     with pytest.raises(ValidationError):
         service_book._send_top_to_user(timestamp=datetime(2022, 4, 15, 20, 20, 20))
+
+
+def test_add_book(service_book):
+    service_book.add_book(**data_book)
+    service_book.book_repo.add_instance.assert_called_once()
+
+
+def test_add_book_wrong_args(service_book):
+    with pytest.raises(ValidationError):
+        service_book.add_book()
 
 
 def test_get_book(service_book):

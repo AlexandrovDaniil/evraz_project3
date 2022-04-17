@@ -121,7 +121,6 @@ def book_history():
     return dataclasses.BookHistory(
         book_id=9781491954463,
         user_id=1,
-        action='take book',
         booking_time=datetime(2022, 4, 15, 20, 20, 20),
         id=1
     )

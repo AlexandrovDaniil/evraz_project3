@@ -39,7 +39,6 @@ class BookInfo(DTO):
 class BookHistoryInfo(DTO):
     book_id: int
     user_id: int
-    action: str
     booking_time: datetime
     id: Optional[int] = None
 
@@ -73,7 +72,6 @@ class Books:
             res = []
             top_books = self.book_repo.get_top_3(tag, timestamp)
             if top_books:
-                # raise errors.AnyNewBook()
                 for book in top_books:
                     prep_d = {'title': book.title,
                               'rating': book.rating,
@@ -101,7 +99,8 @@ class Books:
             page_count = (int(r['total']) // 10) + (1 if int(r['total']) % 10 != 0 else 0)
             page_count = page_count if page_count < 5 else 5
             for i in range(1, page_count + 1):
-                t = threading.Thread(target=self.add_book, kwargs={'tag': tag, 'page': i, 'timestamp': timestamp})
+                t = threading.Thread(target=self.get_books_from_page,
+                                     kwargs={'tag': tag, 'page': i, 'timestamp': timestamp})
                 t.start()
                 threads.append(t)
             for thread in threads:
@@ -110,7 +109,7 @@ class Books:
 
     @join_point
     @validate_arguments
-    def add_book(self, tag: str, page: int, timestamp: datetime):
+    def get_books_from_page(self, tag: str, page: int, timestamp: datetime):
         books_ids = []
         book_page = requests.get(f'https://api.itbook.store/1.0/search/{tag}/{page}').json()
         for book in book_page['books']:
@@ -118,24 +117,15 @@ class Books:
         for book_id in books_ids:
             book = requests.get(f'https://api.itbook.store/1.0/books/{int(book_id)}').json()
             book['price'] = float(book['price'][1:])
-            book_info = BookInfo(
-                title=book['title'],
-                subtitle=book['subtitle'],
-                authors=book['authors'],
-                publisher=book['publisher'],
-                isbn10=book['isbn10'],
-                isbn13=book['isbn13'],
-                pages=book['pages'],
-                year=book['year'],
-                rating=book['rating'],
-                desc=book['desc'],
-                price=book['price'],
-                language=book['language'],
-                tag=tag,
-                timestamp=timestamp
-            )
-            new_book = book_info.create_obj(Book)
-            self.book_repo.add_instance(new_book)
+            book['timestamp'] = timestamp
+            book['tag'] = tag
+            self.add_book(**book)
+
+    @join_point
+    @validate_with_dto
+    def add_book(self, book_info: BookInfo):
+        new_book = book_info.create_obj(Book)
+        self.book_repo.add_instance(new_book)
 
     @join_point
     @validate_arguments
@@ -181,17 +171,15 @@ class Books:
             raise errors.NoBook(id=book_id)
         if not self._is_user_has_book(user_id):
             if (book.booking_time is None or book.booking_time < datetime.utcnow()) and book.bought is False:
-                time_of_book = datetime.utcnow() + timedelta(minutes=period)
+                time_of_booking = datetime.utcnow() + timedelta(minutes=period)
                 book_history = BookHistoryInfo(
                     book_id=book_id,
                     user_id=user_id,
-                    action='take book',
-                    booking_time=time_of_book
+                    booking_time=time_of_booking
                 )
                 new_row_history = book_history.create_obj(BookHistory)
                 self.book_repo.add_books_history_row(new_row_history)
-                self.book_repo.update_booking_time(book_id, time_of_book)
-
+                self.book_repo.update_booking_time(book_id, time_of_booking)
             else:
                 raise errors.NotAvailable(id=book_id)
         else:

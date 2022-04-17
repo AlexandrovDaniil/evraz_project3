@@ -1,0 +1,20 @@
+@startuml
+
+header Финальный проект
+title Схема БД микросервиса пользователей
+
+hide circle
+skinparam linetype ortho
+
+
+entity user {
+  * **id**  :  int
+  __
+    name  :  varchar
+    login  :  varchar
+    password  :  varchar
+
+}
+
+
+@enduml

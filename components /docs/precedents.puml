@@ -1,0 +1,39 @@
+@startuml
+
+header Финальный проект
+title Диаграмма прецедентов
+
+left to right direction
+
+rectangle "Библиотека" {
+  usecase "Посмотреть доступные книги" as show_books
+  usecase "Посмотреть информацию о книге" as show_books_info
+  usecase "Взять книгу" as take_book
+  usecase "Купить книгу" as buy_book
+  usecase "Вернуть книгу книгу" as return_book
+  usecase "Получить активную книгу" as active_book
+}
+
+
+actor "Авторизированный пользователь" as user
+user -- show_books
+user -- show_books_info
+user -- take_book
+user -- buy_book
+user -- return_book
+user -- active_book
+
+
+rectangle "Вход в систему" {
+  usecase "Зарегистрироваться" as add_user
+  usecase "Авторизация" as auth_user
+
+}
+
+actor "Незарегистрированный пользователь" as unreg_user
+unreg_user -- add_user
+
+actor "Зарегистрированный пользователь" as reg_user
+reg_user -- auth_user
+
+@enduml

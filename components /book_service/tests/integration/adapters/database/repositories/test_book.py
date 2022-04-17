@@ -54,14 +54,12 @@ def fill_db(session):
         {
             'book_id': 9781491954463,
             'user_id': 1,
-            'action': 'take book',
             'booking_time': datetime(2022, 4, 15, 20, 20, 20),
             'id': 1
         },
         {
             'book_id': 9781491954464,
             'user_id': 2,
-            'action': 'take book',
             'booking_time': datetime(2021, 4, 15, 20, 20, 20),
             'id': 2
         }
@@ -105,7 +103,6 @@ book_data_new = {
 book_history_data_new = {
     'book_id': 9781491954465,
     'user_id': 1,
-    'action': 'take book',
     'booking_time': datetime(2032, 4, 15, 20, 20, 20),
     'id': 3
 }
